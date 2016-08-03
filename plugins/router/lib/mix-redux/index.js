@@ -1,6 +1,6 @@
 import Provider from './provider'
 
-const PropTypes = require('ReactPropTypes');
+const PropTypes = require('react/lib/ReactPropTypes');
 const { defineStore, usingRedux, invariant } = RNPlus.Redux;
 
 const uniqueStoreSymbol = `This_view_has_it's_own_store.`;

@@ -10,7 +10,7 @@ import {
     View,
 } from 'react-native';
 
-let buildStyleInterpolator = require('buildStyleInterpolator');
+let buildStyleInterpolator = require('react-native/Libraries/Utilities/buildStyleInterpolator.js');
 
 let popupOpts = {};
 
@@ -63,7 +63,7 @@ RNPlus.popup = {
     },
 };
 
-class _rnplus_popup extends QView {
+class _rnplus_popup extends __QView {
 
     styles = {
         popup: {

@@ -260,7 +260,7 @@ React.RNPlus.addPlugin('webx', function(opts, pOpts, React) {
             return ele;
         };
     });
-}, function(React) {
+}, function() {
     WindowSize = ReactNative.Dimensions.get('window');
     vWidth = WindowSize.width / 100;
     vHeight = WindowSize.height / 100;

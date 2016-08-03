@@ -1,4 +1,4 @@
-const PropTypes = require('ReactPropTypes');
+const PropTypes = require('react/lib/ReactPropTypes');
 
 export const propTypes = {
     store: PropTypes.shape({

@@ -3,6 +3,6 @@
   "version": "0.0.1",
   "description": "React Native Plus",
   "dependencies": {
-    "babel-preset-qreact": "0.0.1"
+    "babel-plugin-rnplus": "git+ssh://git@git.jimubox.com/react-native/babel-plugin-rnplus"
   }
 }
