@@ -1,7 +1,6 @@
-import React from 'react';
 import ReactNative from 'react-native';
 
-let _ = React.RNPlus.utils;
+let _ = RNPlus.utils;
 
 let transformRegs = [
     /(translate|skew|scale)(X|Y)?\s*\(([^\)]+)\)/g,
@@ -123,7 +122,7 @@ let mergeStyles = (styles, tag, extra) => {
     }
 }
 
-React.RNPlus.addPlugin('webx', function(opts, pOpts, React) {
+RNPlus.addPlugin('webx', function(opts, pOpts, React) {
     let ORIGIN_CREATE_ElEMENT = React.createElement;
     let {TouchableWithoutFeedback} = ReactNative;
 
