@@ -47,7 +47,7 @@ import './views/pageB'
 使用 Router：
 
 ```js
-class base extends QView {
+class base extends PView {
     styles = styles;
     render = render;
 
@@ -245,7 +245,7 @@ API | 触发的生命周期回调
 在定义页面时就定义好该页面的场景。方法如下：
 
 ```js
-class Page extends QView {
+class Page extends PView {
     static routerPlugin = {
         sceneConfig: sceneConfig,
     };

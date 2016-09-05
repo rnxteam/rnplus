@@ -6,8 +6,8 @@
 
 1. 相比之前版本的一个 view 一个 store，本版本提供单一 store 的数据管理方式，使得页面之前可以进行数据的共享。如果部分页面需要使用独立的 store，本版本还在 router 上进行了适配，可以直接使用 `RNPlus.open('pageName:new')` 的方式，开启拥有独立 store 的页面。
 1. 简化了 store 的配置方式，之前还需要使用 `defineStore` 来处理，现在只需要配置 `RNPlus.defaults.redux` 属性即可。
-1. 与之前 QView 无法使用 `reduxPlugin` 不同，本版本在 QView 和 QComponent 下都可以指定 `mapStateToProps` 和 `mapDispatchToProps`，获取和调度 store 中的数据。即使是拥有独立 store 的 QView 页面也可以进行 `reduxPlugin` 的配置。
-1. 需要注意的一点是，使用 `RNPlus.open` 打开的页面，在对应的 QView 组件上会有名为 `param` 的属性，表示页面参数。正常情况下，QView 内部的 QComponent 组件可以在 [context](https://facebook.github.io/react/docs/context.html) 上获取，但如果本组件拥有 `reduxPlugin`，插件会帮你把 `param` 参数挂载到 `props` 上。
+1. 与之前 PView 无法使用 `reduxPlugin` 不同，本版本在 PView 和 PComponent 下都可以指定 `mapStateToProps` 和 `mapDispatchToProps`，获取和调度 store 中的数据。即使是拥有独立 store 的 PView 页面也可以进行 `reduxPlugin` 的配置。
+1. 需要注意的一点是，使用 `RNPlus.open` 打开的页面，在对应的 PView 组件上会有名为 `param` 的属性，表示页面参数。正常情况下，PView 内部的 PComponent 组件可以在 [context](https://facebook.github.io/react/docs/context.html) 上获取，但如果本组件拥有 `reduxPlugin`，插件会帮你把 `param` 参数挂载到 `props` 上。
 
 ## 基本概念
 
@@ -109,7 +109,7 @@ export default combineReducers({
 
 ### 组件使用方式
 
-redux 插件在 QView 和 QComponent 中的使用方式完全一致。给组件添加一个**静态方法** `reduxPlugin` 即可，里面可以提供四个参数，分别为 `mapStateToProps`、`mapDispatchToProps`、`mergeProps`、`options`，其中业务中最常见的是前两个参数：
+redux 插件在 PView 和 PComponent 中的使用方式完全一致。给组件添加一个**静态方法** `reduxPlugin` 即可，里面可以提供四个参数，分别为 `mapStateToProps`、`mapDispatchToProps`、`mergeProps`、`options`，其中业务中最常见的是前两个参数：
 
 1. `mapStateToProps(state, [ownProps])`：如果定义该参数，组件将会监听 store 的变化，发生改变时改变组件中对应的 props 的值。如果没有设置这个参数，组件将**不会**监听 store：即在 store 发生变化时，组件将不会收到任何响应和更新。
 2. `mapDispatchToProps(dispatch, [ownProps])`：如果定义该参数，等于给组件的 props 上挂载对应的 [Action Creator](http://cn.redux.js.org/docs/Glossary.html#action-creator)。这只是一个便捷用法，如果不使用，还是可以使用 `dispatch` 来触发 store 更新。

@@ -27,7 +27,7 @@ const DEFAULTS = {
     activeOpacity: 0.6,
 };
 
-class _rnplus_navBar extends __QComponent {
+class _rnplus_navBar extends __PComponent {
 
     styles = styles;
 

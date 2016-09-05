@@ -5,7 +5,7 @@ import mw from './middlewares'
 const { isPlainObject, extend } = RNPlus.utils;
 
 /**
- * 定义可与 QView 绑定的 store
+ * 定义可与 PView 绑定的 store
  *
  * @param options {Array} 官方提供的 createStore 参数, 包含 reducer/initialState/enhancer
  * @param middleware {Array} 中间件数组, 我们内置的中间件会放在所有中间件之后

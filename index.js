@@ -1,4 +1,4 @@
-import RNPlus from './lib/core.js';
+import RNPlus, { View, Component } from './lib/core.js';
 
 // 引入 webx
 import './plugins/webx';
@@ -13,3 +13,7 @@ import './plugins/router';
 RNPlus.defaults.globalPlugins = ['redux', 'router', 'webx'];
 
 export default RNPlus;
+export {
+    View,
+    Component,
+}

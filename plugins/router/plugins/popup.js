@@ -63,7 +63,7 @@ RNPlus.popup = {
     },
 };
 
-class _rnplus_popup extends __QView {
+class _rnplus_popup extends __PView {
 
     styles = {
         popup: {
