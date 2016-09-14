@@ -5,7 +5,7 @@ RNPlus 是 React Native 的前端拓展框架，简化并增强前端开发。
 
 ## 介绍
 
-* Ext-Base: 核心、插件机制、Utils
+* Base: 核心、插件机制、Utils
 * Router: 路由部分，包括同 Context 内的路由，以及和 Native View 之间的跳转
 * Redux：数据部分，与 Router 结合的单向数据流操作
 * Webx: 前端扩展部分，包括对 Style 的扩展和对事件的一些改动
@@ -14,7 +14,10 @@ RNPlus 是 React Native 的前端拓展框架，简化并增强前端开发。
 
 ```js
 // 引入 RNPlus
-import 'rnplus'
+import {
+    PView,
+    PComponent,
+} from 'rnplus';
 
 // 定义一个页面
 class PageA extends PView {
@@ -44,7 +47,7 @@ class Demo extends PView {
 }
 ```
 
-注意：
+**注意：**
 
 不要修改对 `PView` 和 `PComponent` 的引用。以下写法是**无效的**：
 
@@ -59,19 +62,19 @@ class Demo extends MyView {
 }
 ```
 
-之所以这样是因为 RNPlus 为方便开发，已将 `PView` 和 `PComponent` 挂载到全局上，并且通过配套的 babel 插件自动完成注册。你也可以通过以下方式手动完成：
+之所以这样是因为 RNPlus 为方便开发，会通过配套的 babel 插件自动完成注册。如果你一定要像上面那样，你也可以通过以下方式手动完成注册：
 
 ```js
-// 传统的写法
-import RNPlus, { View } from 'rnplus';
+const MyView = PView;
 
-class Demo extends View {
+class Demo extends MyView {
     render() {
         return <Text>Hello, RNPlus!</Text>
     }
 }
 
-Base = RNPlus.register(Base, 'Base');
+// 手动注册
+Demo = RNPlus.register(Demo, 'Demo');
 ```
 
 #### React.Ext.defaults
