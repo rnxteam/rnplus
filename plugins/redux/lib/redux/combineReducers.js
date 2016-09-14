@@ -41,7 +41,7 @@ function getUnexpectedStateShapeWarningMessage(inputState, reducers, action) {
         )
     }
 
-    if (!React.RNPlus.utils.extend(inputState)) {
+    if (!RNPlus.utils.extend(inputState)) {
         return (
             `The ${argumentName} has unexpected type of "` +
             ({}).toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] +

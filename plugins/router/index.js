@@ -1,6 +1,6 @@
 /**
- * React.RNPlus-Router
- * React.RNPlus 路由插件
+ * RNPlus-Router
+ * RNPlus 路由插件
  *
  * @author  yayu.wang@qunar.com
  * @version 0.0.2
