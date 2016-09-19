@@ -3,7 +3,7 @@ import ReactNative from 'react-native';
 let Bridge = {
     // 发送广播
     sendBroadcast(opts) {
-        callNativeAPI('QRCTBroadCastManager', 'sendBroadcast', [opts.name, opts.data, opts.hybridId || '']);
+        callNativeAPI('QRCTBroadCastManager', 'sendBroadcast', [opts.name, opts.data, opts.projectId || '']);
     },
     // 发送 schema
     sendSchema(opts, cb = () => {}) {
@@ -16,7 +16,7 @@ let Bridge = {
     },
     // 关闭指定 RN VC
     backToReactVC(opts) {
-        callNativeAPI('QRCTVCManager', 'backToReactVC', [opts.hybridId || RNPlus.defaults.hybridId || '', opts.index, opts.adrToken || '', {}]);
+        callNativeAPI('QRCTVCManager', 'backToReactVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.index, opts.adrToken || '', {}]);
     },
     // 关闭当前 RN VC
     closeCurrentVC() {
@@ -28,7 +28,7 @@ let Bridge = {
     },
     // 打开新的 VC
     openNewVC(opts) {
-        callNativeAPI('QRCTVCManager', 'openNewVC', [opts.hybridId || RNPlus.defaults.hybridId || '', opts.moduleName || RNPlus.defaults.appName, opts.data || {}, opts.adrToken || '', {}]);
+        callNativeAPI('QRCTVCManager', 'openNewVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.moduleName || RNPlus.defaults.appName, opts.data || {}, opts.adrToken || '', {}]);
     },
     // 关闭安卓透明 Activity
     closeActivityAndroid(adrToken) {

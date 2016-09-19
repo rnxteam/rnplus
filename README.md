@@ -77,14 +77,14 @@ class Demo extends MyView {
 Demo = RNPlus.register(Demo, 'Demo');
 ```
 
-#### React.Ext.defaults
+#### RNPlus.defaults
 
 全局配置，用户可以配置一些全局的设置。
 
 默认配置：
 
 ```js
-React.Ext.defaults = {
+RNPlus.defaults = {
     appName: '',
     globalPlugins: ['webx', 'router', 'redux'],
 };
@@ -96,12 +96,12 @@ React.Ext.defaults = {
 
 ### 插件开发者 API
 
-#### React.Ext.addPlugin(name, adapter, ininFn, registerFn);
+#### RNPlus.addPlugin(name, adapter, ininFn, registerFn);
 
 添加插件
 * `name`：`{String}` 插件名
 * `adapter`: `{Function}` 适配器
-* `ininFn`: `{Function}` QReact-Ext 初始化回调函数
+* `ininFn`: `{Function}` RNPlus 初始化回调函数
 * `registerFn`: `{Function}` PView/PComponent 注册时回调函数
 
 示例

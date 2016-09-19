@@ -616,9 +616,9 @@ function receiveSchemeCB(res) {
 
    mergeDataFromUrl(res.url);
 
-   // 如果没有设置 hybridId，帮他设置下
-   if (!RNPlus.defaults.hybridId) {
-       RNPlus.defaults.hybridId = data.hybridId;
+   // 如果没有设置 projectId，帮他设置下
+   if (!RNPlus.defaults.projectId) {
+       RNPlus.defaults.projectId = data.projectId;
    }
 
    // 是否需要 rnplus 处理

@@ -27,10 +27,10 @@
 引用与配置：
 
 ```js
-// 配置业务 hybridId，在多业务跳转时会用到
-RNPlus.defaults.hybridId = 'hotel';
+// 配置业务 projectId，在多业务跳转时会用到
+RNPlus.defaults.projectId = 'myProject';
 // 配置应用名（可以不配置，默认为 'Naive'）
-RNPlus.defaults.appName = 'extDemo';
+RNPlus.defaults.appName = 'rnxDemo';
 // 配置首页（可以不配置，默认为引入的第一个页面）
 RNPlus.defaults.indexView = 'base';
 
@@ -266,13 +266,9 @@ RNPlus.open('Page', {
 
 ## 导航栏
 
-> `0.0.2` 或更高版本支持。查看 `0.0.1` 版本文档请戳[传送门](http://gitlab.corp.qunar.com/react_native/qunar_react_native_ext/blob/0.0.1/plugins/router/README.md)。
-
 Router 提供了两种方式来使用导航栏，一种是全局级导航栏，另一种是页面级导航栏。
 
 ### 全局级导航栏
-
-> 全局级导航栏有一个独立的 demo，使用 `npm run routerNavBar` 运行。
 
 原理是配置 `Navigator` 的 `navigationBar` 属性，来实现一个全局级别的导航栏。
 
@@ -350,13 +346,11 @@ let navBarOpts = {
 
 ## 弹层
 
-> `0.0.2` 或更高版本支持。
-
 由于 Modal 暂未支持安卓，所以可以用这个组件用以替代 Modal。
 
 实际上该组件是一个 View，所以它具有一个 View 所具有的完整的生命周期，并且在安卓机器上你可以通过物理返回键关闭它。同时这也带来一个副作用，弹层的打开关闭会触发弹层下面页面的 `deactived` 和 `actived` 回调。
 
-该组件通过改动 Navigator 的代码获得了支持，所以它依赖于 `QRN@1.0.0` 或更高版本。
+该组件通过改动 Navigator 的代码获得了支持，所以它依赖于 `RNX@0.30.0` 或更高版本。
 
 该组件暂不支持全局级导航栏。
 
@@ -412,7 +406,7 @@ RNPlus.Router.Bridge.sendBroadcast({
         msg: 'i tell u a msg'
     },
     // 指定发送目标，不指定则发给全局
-    hybridId: 'hotel',
+    projectId: 'hotel',
 });
 ```
 
@@ -507,16 +501,16 @@ RNPlus.Router.Bridge.sendScheme({
 
 ```html
 <p>
-	<a href="qunariphone://react/open?hybridId=qunar_react_native_ext&view=pageA">open：强制新开</a>
+	<a href="qunariphone://react/open?projectId=qunar_react_native_ext&view=pageA">open：强制新开</a>
 </p>
 <p>
-	<a href="qunariphone://react/biz?hybridId=qunar_react_native_ext&qInitView=pageA&forceOpen=true&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：强制新开</a>
+	<a href="qunariphone://react/biz?projectId=qunar_react_native_ext&qInitView=pageA&forceOpen=true&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：强制新开</a>
 </p>
 <p>
-	<a href="qunariphone://react/biz?hybridId=qunar_react_native_ext&qInitView=base&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：返回 base</a>
+	<a href="qunariphone://react/biz?projectId=qunar_react_native_ext&qInitView=base&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：返回 base</a>
 </p>
 <p>
-	<a href="qunariphone://react/biz?hybridId=qunar_react_native_ext&qInitView=pageA&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：返回 pageA</a>
+	<a href="qunariphone://react/biz?projectId=qunar_react_native_ext&qInitView=pageA&initProps=%7B%22param%22%3A%7B%22name%22%3A%22wyy%22%7D%7D">biz：返回 pageA</a>
 </p>
 ```
 
