@@ -1,8 +1,6 @@
 # Router - RNPlus Plugin
 
-当前最新版本：`0.0.2`
-
-> 配合使用 [RNPlus 工程内置 demo](http://gitlab.corp.qunar.com/react_native/qunar_react_native_ext/tree/master)，阅读该文档，风味更加哦～
+> 配合使用 [rnxDemo](http://git.jimubox.com/react-native/rnxDemo)，阅读该文档，风味更加哦～
 
 ## 介绍
 
