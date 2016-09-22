@@ -172,6 +172,8 @@ RNPlus.addPlugin('webx', function(opts, pOpts, React) {
             var displayName = obj.displayName;
             options = options || {};
             options.style = options.style ? [].concat(options.style) : [];
+
+            // class 处理
             if (_.isString(options['class'])) {
                 options['class'].split(' ').reverse().forEach((name) => {
                     if (styles[name]) {
@@ -214,6 +216,8 @@ RNPlus.addPlugin('webx', function(opts, pOpts, React) {
             if (styles[displayName]) {
                 options.style.unshift(styles[displayName]);
             }
+
+            // 让子组件也能使用 WebX
             for (let key in options) {
                 if (_.isFunction(options[key]) && options[key].toString().indexOf('.createElement') > -1) {
                     let originFn = options[key];
@@ -224,21 +228,26 @@ RNPlus.addPlugin('webx', function(opts, pOpts, React) {
                     }
                 }
             }
-            Object.keys(options).forEach((key) => {
-                if (key.indexOf('on') === 0) {
-                    if (_.isFunction(options[key])) {
-                        options[key] = options[key].bind(opts);
-                    }
-                    if (_.isString(options[key])) {
-                        if (_.isFunction(opts[options[key]])) {
-                            options[key] = opts[options[key]].bind(opts);
-                        } else {
-                            console.warn('Not Found Function: this.' + options[key]);
-                            options[key] = _.noop;
-                        }
-                    }
-                }
-            });
+
+            // 自动 bind(this)
+            // Object.keys(options).forEach((key) => {
+            //     if (key.indexOf('on') === 0) {
+            //         if (_.isFunction(options[key])) {
+            //             options[key] = options[key].bind(opts);
+            //         }
+            //
+            //         // 允许使用字符串指定回调
+            //         if (_.isString(options[key])) {
+            //             if (_.isFunction(opts[options[key]])) {
+            //                 options[key] = opts[options[key]].bind(opts);
+            //             } else {
+            //                 console.warn('Not Found Function: this.' + options[key]);
+            //                 options[key] = _.noop;
+            //             }
+            //         }
+            //     }
+            // });
+
             let ele = ORIGIN_CREATE_ElEMENT.apply(this, arguments);
 
             // 在 rn 0.20 版本中，View 的 displayName 是 RCTView

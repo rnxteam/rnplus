@@ -138,17 +138,3 @@ testPressView() {
     alert('You pressed a View.');
 }
 ```
-
-### 组件方法自动 `.bind(this)`
-
-`on` 开头的方法，无需手动 `.bind(this)`。
-
-```js
-// jsx
-<TouchableHighlight onPress={this.testAutoBind} />
-
-// js
-testAutoBind() {
-    console.log('testAutoBind', this);
-}
-```
