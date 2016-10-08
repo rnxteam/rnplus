@@ -84,7 +84,7 @@ function mergeOpts(opts = {}) {
 RNPlus.addPlugin('redux', noop, noop, (Component, isView, plugins, name) => {
     let options = Component.reduxPlugin;
 
-    if (plugins.indexOf('redux') === -1 || !usingRedux()) {
+    if (plugins.indexOf('redux') !== -1 && !usingRedux()) {
         invariant(
             !isPlainObject(options),
             `如果想使用 redux 插件，请至少配置 'RNPlus.defaults.redux' 的 'reducer' 属性。`

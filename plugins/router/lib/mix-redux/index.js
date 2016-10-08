@@ -58,6 +58,7 @@ export default {
     wrapperNavigator(navigatorComponent) {
         if (usingRedux()) {
             this.__store = defineStore();
+            RNPlus.store = this.__store;
             return <Provider store={ this.__store }>{ navigatorComponent }</Provider>;
         } else {
             return navigatorComponent;

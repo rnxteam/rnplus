@@ -280,25 +280,21 @@ function init() {
 
                 // @redux 使用 store 包裹 Navigator
                 let navigatorComponent = mixRedux.wrapperNavigator(
+                  <View style={{flex: 1}}>
                     <Navigator
-                        initialRoute={{
-                            name: indexName,
-                            opts: indexOpts,
-                            routerPlugin: view.Component.routerPlugin,
-                            hashKey: getHashKey(),
-                        }}
-                        configureScene={this.configureScene}
-                        renderScene={this.renderScene}
-                        onDidFocus={this.onDidFocus}
-                        navigationBar={navigationBar}
+                      initialRoute={{
+                          name: indexName,
+                          opts: indexOpts,
+                          routerPlugin: view.Component.routerPlugin,
+                          hashKey: getHashKey(),
+                      }}
+                      configureScene={this.configureScene}
+                      renderScene={this.renderScene}
+                      onDidFocus={this.onDidFocus}
+                      navigationBar={navigationBar}
                     />
-                );
-
-                return (
-                    <View style={{flex: 1}}>
-                        { navigatorComponent }
-                        { moreComponents }
-                    </View>
+                    { moreComponents }
+                  </View>
                 );
 
                 return navigatorComponent;
