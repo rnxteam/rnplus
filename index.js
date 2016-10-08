@@ -1,8 +1,5 @@
 import RNPlus, { PView, PComponent } from './lib/core.js';
 
-// 引入 webx
-import './plugins/webx';
-
 // 必须先引入 redux
 import './plugins/redux';
 
@@ -10,7 +7,7 @@ import './plugins/redux';
 import './plugins/router';
 
 // 配置全局插件
-RNPlus.defaults.globalPlugins = ['redux', 'router', 'webx'];
+RNPlus.defaults.globalPlugins = ['redux', 'router'];
 
 export default RNPlus;
 export {
