@@ -9,4 +9,3 @@
 
 import './lib/router.js';
 import './plugins/popup.js';
-import './plugins/navBar';

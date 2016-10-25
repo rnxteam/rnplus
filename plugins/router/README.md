@@ -296,51 +296,8 @@ RNPlus.defaults.router = {
 
 ### 页面级导航栏
 
-原理是自己在每个页面中实现导航栏。Router 也提供了一个导航栏组件 `RNPlus.Router.NavBar`。
+原理是自己在每个页面中实现导航栏。推荐使用 RNX-UI 导航栏组件 [rnx-ui-navbar](https://www.npmjs.com/package/rnx-ui-navbar)。
 
-使用方法：
-
-```js
-// jsx
-<RNPlus.Router.NavBar opts={navBarOpts} />
-
-// 配置项
-let navBarOpts = {
-    // 背景色，默认 Qunar 蓝
-    backgroundColor: '#fff',
-    // 标题样式
-    centerTextStyle: {
-        // 标题颜色，默认白色
-        color: '#000',
-    },
-    // 标题内容，默认空字符串
-    title: '导航栏',
-    // 标题到左右两边的距离，默认 50
-    titleGap: 100,
-    // 左侧按钮样式
-    leftTextStyle: {
-        // 左侧按钮颜色，默认白色
-        color: '#007AFF',
-    },
-    // 左侧按钮文字，默认 '返回'
-    leftText: '弹框',
-    // 左侧按钮点击事件，默认 `RNPlus.back()`
-    leftEvent() {
-        alert('left...')
-    },
-    // 右侧按钮样式
-    leftTextStyle: {
-        // 右侧按钮颜色，默认白色
-        color: '#007AFF',
-    },
-    // 右侧按钮文字，默认空字符串
-    rightText: '相册',
-    // 右侧按钮点击事件，默认空函数
-    rightEvent() {
-        alert('right...');
-    },
-};
-```
 
 ## 弹层
 
