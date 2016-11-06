@@ -4,5 +4,8 @@
   "description": "React Native Plus",
   "dependencies": {
     "babel-plugin-rnplus": "git+ssh://git@git.jimubox.com/react-native/babel-plugin-rnplus.git"
+  },
+  "devDependencies": {
+    "eslint-config-pintec": "*"
   }
 }

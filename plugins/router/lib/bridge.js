@@ -22,7 +22,7 @@ let Bridge = {
     closeCurrentVC() {
         callNativeAPI('QRCTVCManager', 'closeCurrentVC', [{}]);
     },
-    // 之行 Native 函数
+    // 执行 Native 函数
     sendNativeEvents(opts) {
         callNativeAPI('QRCTNativeCallbackManager', 'sendNativeEvents', [opts.id, opts.data || {}]);
     },

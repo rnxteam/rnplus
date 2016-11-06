@@ -1,8 +1,11 @@
-import React from 'react';
+import React, {
+  Component,
+  PropTypes,
+} from 'react';
 import ReactNative, {
-    Navigator,
-    AppRegistry,
-    View
+  Navigator,
+  AppRegistry,
+  View,
 } from 'react-native';
 
 import mixRedux from './mix-redux';
@@ -10,8 +13,7 @@ import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 
-let Router = {};
-
+const Router = {};
 /**
  * VC 数组，每个 VC 包含一个导航器和一个导航栏
  * @type {Array}
@@ -20,8 +22,7 @@ let Router = {};
  *     nav,     // 导航器
  * }]
  */
-let vcs = [];
-
+const vcs = [];
 /**
  * 存放所有页面的容器
  * @type {Object}
@@ -35,284 +36,294 @@ let vcs = [];
  *     }
  * }
  */
-let views = {};
-
+const views = {};
 // 是否是 Qunar React Native
-let isQReact = !!ReactNative.NativeModules.QRCTDeviceInfo;
+const isQReact = !!ReactNative.NativeModules.QRCTDeviceInfo;
 // 暂存 actived 参数
-let activedParam = null;
+let gActivedParam = {};
 
-// 这边匿名没有用 => 简化是为了保证 this 正确
-RNPlus.addPlugin('router', function(context, pOpts={}, React, isView) {
-    if (!isView) {
-        return;
-    }
 
-    let name;
-    let view = {};
+class NavComp extends Component {
+  constructor(props) {
+    super(props);
 
-    // 寻找 view
-    Object.keys(views).some(key => {
-        let viewForKey = views[key];
-        if (context.constructor === viewForKey.Component ||
-            context.constructor === viewForKey.Component.WrappedComponent) {
-            name = key;
-            view = viewForKey;
-            return true;
-        }
-    });
+    this.indexName = this.getIndexName();
+    this.currentView = getViewByName(this.indexName);
 
-    if (!view) {
-        return;
-    }
+    this.onDidFocus = this.onDidFocus.bind(this);
+  }
 
-    // 获取事件函数处理对象
-    view.em = this;
-    // 获取页面内 Router 插件配置参数
-    view.routerOpts = pOpts;
+  componentDidMount() {
+    if (this.indexName) {
+      const view = getViewByName(this.indexName);
+      const param = getCurrentRoute().opts.param;
 
-    // 获取 view element
-    // this.on('beforeComponentWillMount', (reactView) => {
-    //     view.reactView = reactView;
-    // });
-
-    // 触发 ready
-    this.on('afterComponentWillMount', (reactView) => {
-        this.trigger('ready');
-    });
-
-    // 触发 destroy
-    this.on('afterComponentWillUnmount', (reactView) => {
-        this.trigger('destroy');
-    });
-
-    // 适配 React.RNPlus-Redux
-    let routeInfo = getRouteInfoByName(name);
-    let routerParam = {};
-    if (routeInfo) {
-        let route = routeInfo.route;
-        if (route.opts && route.opts.param) {
-            routerParam = route.opts.param;
-        }
-    }
-
-    // @redux 将 routerParam 插入到 context 中, 令子组件调用
-    mixRedux.setChildContext(context, routerParam);
-}, function() {
-    init();
-}, function(Component, isView, plugins, className) {
-    // 获取 Component
-    if (isView) {
-        if (!RNPlus.defaults.indexView && className.indexOf('_rnplus_') != 0) {
-            RNPlus.defaults.indexView = className;
-        }
-        views[className] = { Component };
-    }
-});
-
-/**
- * Router 初始化函数
- */
-function init() {
-
-    let indexName;
-
-    let NavComp = React.createClass({
-        componentDidMount() {
-            if (indexName) {
-                let view = getViewByName(indexName);
-                let param = getCurrentRoute().opts.param;
-
-                if (isQReact) {
-                    // 暂存数据
-                    activedParam = param;
-                } else {
-                    // 是 qunar-react-native，此处无需触发 actived，交由 onShow 来触发
-                    view.em.trigger('actived', getCurrentRoute().opts.param);
-                }
-            } else {
-                errorHandler.noIndexView();
-            }
-        },
-        componentWillUnmount() {
-            let vcIndex = vcs.indexOf(this.vc);
-
-            if (vcIndex > -1) {
-                vcs.splice(vcIndex, 1);
-            }
-        },
-        renderScene(route, navigator) {
-            // navigator 存储
-            let isNewVC = false;
-            // if (this.props.isQRCTDefCreate === true) {
-                if (vcs.length > 0) {
-                    if (navigator !== getCurrentVC().nav) {
-                        // 如果传入的 navigator 不是当前的，则判定为新开了 VC
-                        isNewVC = true;
-                    }
-                } else {
-                    isNewVC = true;
-                }
-            // }
-
-            if (isNewVC) {
-
-                let vc = {
-                    nav: navigator,
-                };
-                this.vc = vc;
-                vcs.push(vc);
-            }
-
-            let view = getViewByName(route.name);
-
-            if (view) {
-                // @redux 新增 store 页面生成 Provider
-                return mixRedux.wrapperView(route, view.Component, getCurrentHashKey);
-            }
-        },
-        configureScene(route) {
-            // 动画种类
-            // PushFromRight
-            // FloatFromRight
-            // FloatFromLeft
-            // FloatFromBottom
-            // FloatFromBottomAndroid
-            // FadeAndroid
-            // HorizontalSwipeJump
-            // HorizontalSwipeJumpFromRight
-            // VerticalUpSwipeJump
-            // VerticalDownSwipeJump
-            let sceneConfig;
-
-            if (route.opts && route.opts.sceneConfig) {
-                sceneConfig = getSceneConfig(route.opts.sceneConfig);
-            } else if (route.routerPlugin && route.routerPlugin.sceneConfig) {
-                sceneConfig = getSceneConfig(route.routerPlugin.sceneConfig);
-            }
-
-            if (!sceneConfig) {
-                sceneConfig = Navigator.SceneConfigs.PushFromRight;
-            }
-
-            return sceneConfig;
-
-            function getSceneConfig(sceneConfig) {
-                let sceneConfigsType = typeof sceneConfig;
-
-                if (sceneConfigsType === 'string') {
-                    return Navigator.SceneConfigs[sceneConfig];
-                } else if (sceneConfigsType === 'object') {
-                    return sceneConfig;
-                }
-            }
-        },
-        onDidFocus(route) {
-            // 判断是否是通过方法切换页面的（与手势回退（右滑）相对）
-            // 之所以这么做，是因为右滑是 `jumpBack` 而不是 `popToRoute`
-            if (route._isBackByFunction) {
-                return;
-            }
-
-            delete route._isBackByFunction;
-
-            // 左划返回
-            // setTimeout 是因为此时 routes 还没减少
-            setTimeout(() => {
-                checkAndOpenSwipeBack();
-            }, 0);
-
-            if (vcs.length < 1) {
-                return;
-            }
-
-            let {nav} = getCurrentVC();
-            let routes = nav.getCurrentRoutes();
-            let curRouteIndex = routes.lastIndexOf(route);
-
-            // 手势回退检测
-            if (curRouteIndex !== routes.length - 1) {
-                // 当前页不是路由列表最后一个，说明是通过手势返回的
-                let lastView = getCurrentView();
-
-                // 触发前一页面的 deactived
-                lastView.em.trigger('deactived');
-                // 触发当前页面的 actived
-                let currentView = getViewByName(route.name);
-                currentView.em.trigger('actived');
-
-                // 重写路由列表，保证当前页时最后一个
-                nav.immediatelyResetRouteStack(routes.slice(0, curRouteIndex + 1));
-            }
-        },
-        render() {
-            // 先取 native 指定的首页
-            indexName = this.props.qInitView;
-
-            if (indexName) {
-                // 判断是否注册了
-                if (!views[indexName]) {
-                    // 如果没注册，使用前端指定的首页
-                    indexName = RNPlus.defaults.indexView;
-                }
-            } else {
-                // 如果 native 没指定，使用前端指定的首页
-                indexName = RNPlus.defaults.indexView;
-            }
-
-            if (indexName) {
-                let indexOpts = {
-                    param: this.props.param || {},
-                };
-
-                let routerOpts = RNPlus.defaults.router || {};
-                let navigationBar = null;
-                let moreComponents = null;
-
-                if (routerOpts.navigationBar) {
-                    navigationBar = routerOpts.navigationBar;
-                }
-                if (routerOpts.moreComponents) {
-                    moreComponents = routerOpts.moreComponents;
-                }
-
-                let view = getViewByName(indexName);
-
-                // @redux 使用 store 包裹 Navigator
-                let navigatorComponent = mixRedux.wrapperNavigator(
-                  <View style={{flex: 1}}>
-                    <Navigator
-                      initialRoute={{
-                          name: indexName,
-                          opts: indexOpts,
-                          routerPlugin: view.Component.routerPlugin,
-                          hashKey: getHashKey(),
-                      }}
-                      configureScene={this.configureScene}
-                      renderScene={this.renderScene}
-                      onDidFocus={this.onDidFocus}
-                      navigationBar={navigationBar}
-                    />
-                    { moreComponents }
-                  </View>
-                );
-
-                return navigatorComponent;
-
-            } else {
-                errorHandler.noIndexView();
-            }
-        }
-    });
-    let appName = RNPlus.defaults.appName;
-    if (appName) {
-        AppRegistry.registerComponent(appName, () => NavComp);
+      if (isQReact) {
+        // 暂存数据
+        gActivedParam = param;
+      }
     } else {
-        errorHandler.noAppName();
+      errorHandler.noIndexView();
     }
+  }
+  componentWillUnmount() {
+    const vcIndex = vcs.indexOf(this.vc);
+
+    if (vcIndex > -1) {
+      vcs.splice(vcIndex, 1);
+    }
+
+    // 触发前一页面的 deactived
+    if (this.currentView) {
+      this.currentView.em.trigger('deactived');
+    }
+
+    this.currentView = null;
+  }
+
+  getIndexName() {
+    // 先取 native 指定的首页
+    let indexName = this.props.qInitView;
+
+    if (indexName) {
+      // 判断是否注册了
+      if (!views[indexName]) {
+        // 如果没注册，使用前端指定的首页
+        indexName = RNPlus.defaults.indexView;
+      }
+    } else {
+      // 如果 native 没指定，使用前端指定的首页
+      indexName = RNPlus.defaults.indexView;
+    }
+
+    return indexName;
+  }
+
+  configureScene(route) {
+    // 动画种类
+    // PushFromRight
+    // FloatFromRight
+    // FloatFromLeft
+    // FloatFromBottom
+    // FloatFromBottomAndroid
+    // FadeAndroid
+    // HorizontalSwipeJump
+    // HorizontalSwipeJumpFromRight
+    // VerticalUpSwipeJump
+    // VerticalDownSwipeJump
+    function getSceneConfig(sceneConfig) {
+      const sceneConfigsType = typeof sceneConfig;
+
+      if (sceneConfigsType === 'string') {
+        return Navigator.SceneConfigs[sceneConfig];
+      } else if (sceneConfigsType === 'object') {
+        return sceneConfig;
+      }
+      return null;
+    }
+
+    let configure;
+
+    if (route.opts && route.opts.sceneConfig) {
+      configure = getSceneConfig(route.opts.sceneConfig);
+    } else if (route.routerPlugin && route.routerPlugin.sceneConfig) {
+      configure = getSceneConfig(route.routerPlugin.sceneConfig);
+    }
+
+    if (!configure) {
+      configure = Navigator.SceneConfigs.PushFromRight;
+    }
+
+    return configure;
+  }
+
+  renderScene(route, navigator) {
+    // navigator 存储
+    let isNewVC = false;
+    // if (this.props.isQRCTDefCreate === true) {
+    if (vcs.length > 0) {
+      if (navigator !== getCurrentVC().nav) {
+        // 如果传入的 navigator 不是当前的，则判定为新开了 VC
+        isNewVC = true;
+      }
+    } else {
+      isNewVC = true;
+    }
+    // }
+
+    if (isNewVC) {
+      const vc = {
+        nav: navigator,
+      };
+      this.vc = vc;
+      vcs.push(vc);
+    }
+
+    const view = getViewByName(route.name);
+
+    if (view) {
+      // @redux 新增 store 页面生成 Provider
+      return mixRedux.wrapperView(route, view.Component, getCurrentHashKey);
+    }
+    return null;
+  }
+
+  onDidFocus(route) {
+    // 左划返回
+    // setTimeout 是因为此时 routes 还没减少
+    // setTimeout(() => {
+    checkAndOpenSwipeBack();
+    // }, 0);
+
+    if (vcs.length < 1) {
+      return;
+    }
+
+    const prevView = this.currentView;
+
+    this.currentView = getCurrentView();
+
+    // 触发前一页面的 deactived
+    if (prevView) {
+      prevView.em.trigger('deactived');
+    }
+    // 触发当前页面的 actived
+    this.currentView.em.trigger('actived', gActivedParam || {});
+    gActivedParam = null;
+  }
+
+  render() {
+    const indexName = this.indexName;
+    if (indexName) {
+      const indexOpts = {
+        param: this.props.param,
+      };
+
+      const routerOpts = RNPlus.defaults.router || {};
+      let navigationBar = null;
+      let moreComponents = null;
+
+      if (routerOpts.navigationBar) {
+        navigationBar = routerOpts.navigationBar;
+      }
+      if (routerOpts.moreComponents) {
+        moreComponents = routerOpts.moreComponents;
+      }
+
+      const view = getViewByName(indexName);
+      // @redux 使用 store 包裹 Navigator
+      const navigatorComponent = mixRedux.wrapperNavigator(
+        <View style={{ flex: 1 }}>
+          <Navigator
+            initialRoute={{
+              name: indexName,
+              opts: indexOpts,
+              routerPlugin: view.Component.routerPlugin,
+              hashKey: getHashKey(),
+            }}
+            configureScene={this.configureScene}
+            renderScene={this.renderScene}
+            onDidFocus={this.onDidFocus}
+            navigationBar={navigationBar}
+          />
+          { moreComponents }
+        </View>
+      );
+
+      return navigatorComponent;
+    }
+
+    errorHandler.noIndexView();
+    return null;
+  }
 }
 
-/*************************
+NavComp.propTypes = {
+  qInitView: PropTypes.string,
+  param: PropTypes.object,
+};
+NavComp.defaultProps = {
+  qInitView: null,
+  param: {},
+};
+
+// 这边匿名没有用箭头函数是为了保证 this 正确
+RNPlus.addPlugin('router', function (context, pOpts = {}, React, isView) {
+  if (!isView) {
+    return;
+  }
+
+  let name;
+  let view = {};
+
+    // 寻找 view
+  Object.keys(views).some((key) => {
+    const viewForKey = views[key];
+    if (context.constructor === viewForKey.Component ||
+            context.constructor === viewForKey.Component.WrappedComponent) {
+      name = key;
+      view = viewForKey;
+      return true;
+    }
+  });
+
+  if (!view) {
+    return;
+  }
+  // 获取事件函数处理对象
+  view.em = this;
+  // 获取页面内 Router 插件配置参数
+  view.routerOpts = pOpts;
+
+  // 获取 view element
+  // this.on('beforeComponentWillMount', (reactView) => {
+  //     view.reactView = reactView;
+  // });
+
+  // 触发 ready
+  this.on('afterComponentWillMount', (reactView) => {
+    this.trigger('ready');
+  });
+
+  // 触发 destroy
+  this.on('afterComponentWillUnmount', (reactView) => {
+    this.trigger('destroy');
+  });
+
+  // 适配 React.RNPlus-Redux
+  const routeInfo = getRouteInfoByName(name);
+  let routerParam = {};
+  if (routeInfo) {
+    const route = routeInfo.route;
+    if (route.opts && route.opts.param) {
+      routerParam = route.opts.param;
+    }
+  }
+
+  // @redux 将 routerParam 插入到 context 中, 令子组件调用
+  mixRedux.setChildContext(context, routerParam);
+}, () => {
+  /**
+   * Router 初始化操作
+   */
+  const appName = RNPlus.defaults.appName;
+  if (appName) {
+    AppRegistry.registerComponent(appName, () => NavComp);
+  } else {
+    errorHandler.noAppName();
+  }
+}, (Component, isView, plugins, className) => {
+    // 获取 Component
+  if (isView) {
+    if (!RNPlus.defaults.indexView && className.indexOf('_rnplus_') !== 0) {
+      RNPlus.defaults.indexView = className;
+    }
+    views[className] = { Component };
+  }
+});
+
+
+/** ***********************
  * Router API
  ************************/
 
@@ -323,31 +334,28 @@ function init() {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.open = (name, opts = {}) => {
-    let currentView = getCurrentView(),
-        nextView = getViewByName(name),
-        res = false;
+  const currentView = getCurrentView();
+  const nextView = getViewByName(name);
+  let res = false;
 
-    if (nextView) {
-        let {nav} = getCurrentVC();
+  if (nextView) {
+    const { nav } = getCurrentVC();
 
-        nav.push({
-            name,
-            opts,
-            routerPlugin: nextView.Component.routerPlugin,
-            hashKey: getHashKey(),
-            _isBackByFunction: true,
-        });
-        setSwipeBackEnabled(false);
+    nav.push({
+      name,
+      opts,
+      routerPlugin: nextView.Component.routerPlugin,
+      hashKey: getHashKey(),
+    });
 
-        setTimeout(() => {
-            nextView.em.trigger('actived', opts.param);
-            currentView.em.trigger('deactived');
-        });
+    setSwipeBackEnabled(false);
 
-        res = true;
-    }
+    gActivedParam = opts.param;
 
-    return res;
+    res = true;
+  }
+
+  return res;
 };
 
 /**
@@ -357,49 +365,25 @@ Router.open = (name, opts = {}) => {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.back = (opts = {}) => {
-    let {nav} = getCurrentVC();
-    let routes = nav.getCurrentRoutes();
-    let currentView = getCurrentView();
-    let res = false;
+  const { nav } = getCurrentVC();
+  const routes = nav.getCurrentRoutes();
+  const currentView = getCurrentView();
+  let res = false;
 
-    if (routes.length > 1) {
-        // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
-        let nextRoute = routes[routes.length - 2];
-        let nextView = getViewByName(nextRoute.name);
+  if (routes.length > 1) {
+    // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
+    nav.pop();
+    checkAndOpenSwipeBack();
+    gActivedParam = opts.param;
 
-        // 方法回退识别（与手势回退（右滑）区分）
-        nextRoute._isBackByFunction = true;
+    res = true;
+  } else {
+    // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
+    closeCurrentVC();
+    res = true;
+  }
 
-        nav.pop();
-        checkAndOpenSwipeBack();
-
-        nextView.em.trigger('actived', opts.param);
-        currentView.em.trigger('deactived');
-
-        res = true;
-    } else {
-        // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
-        if (vcs.length > 1) {
-            // 如果此时有超过1个 VC，那么放心关
-            currentView.em.trigger('deactived');
-            closeCurrentVC();
-
-            let routes = nav.getCurrentRoutes();
-            let nextRoute = routes[routes.length - 1];
-            let nextView = getViewByName(nextRoute.name);
-
-            // 方法回退识别（与手势回退（右滑）区分）
-            nextRoute._isBackByFunction = true;
-
-            res = true;
-        } else {
-            // 如果此时只有1个 VC
-            currentView.em.trigger('deactived');
-            closeCurrentVC();
-        }
-    }
-
-    return res;
+  return res;
 };
 
 /**
@@ -410,51 +394,40 @@ Router.back = (opts = {}) => {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.backTo = (name, opts = {}, _fromGoto) => {
-    let currentView = getCurrentView(),
-        nextRouteInfo = getRouteInfoByName(name),
-        nextView = getViewByName(name),
-        res = false;
+  const currentView = getCurrentView();
+  const nextRouteInfo = getRouteInfoByName(name);
+  const nextView = getViewByName(name);
+  let res = false;
 
-    if (nextView) {
-        if (nextRouteInfo) {
+  if (nextView) {
+    if (nextRouteInfo) {
+      const { route, vcIndex } = nextRouteInfo;
+      const { nav } = vcs[vcIndex];
 
-            let {route, vcIndex} = nextRouteInfo;
-            let {nav} = vcs[vcIndex];
+      // MAIN: 调用原生 API，路由回退
+      nav.popToRoute(route);
 
-            // 方法回退识别（与手势回退（右滑）区分）
-            route._isBackByFunction = true;
+      // QReact
+      if (vcIndex < vcs.length - 1) {
+        // 暂存数据
+        gActivedParam = opts.param;
+        // 通知 Native
+        Bridge.backToReactVC({
+          // VC 标识
+          index: vcIndex,
+          // 可选，安卓透明层标识（只有安卓才有）
+          adrToken: '',
+        });
+      }
 
-            // MAIN: 调用原生 API，路由回退
-            nav.popToRoute(route);
+      checkAndOpenSwipeBack(vcIndex);
 
-            // QReact
-            if (vcIndex < vcs.length - 1) {
-                // 暂存数据
-                activedParam = opts.param;
-                // 通知 Native
-                Bridge.backToReactVC({
-                    // VC 标识
-                    index: vcIndex,
-                    // 可选，安卓透明层标识（只有安卓才有）
-                    adrToken: '',
-                });
-            } else {
-                nextView.em.trigger('actived', opts.param);
-            }
-
-            checkAndOpenSwipeBack(vcIndex);
-
-            currentView.em.trigger('deactived');
-
-            res = true;
-        } else {
-            if (_fromGoto !== true) {
-                errorHandler.noRoute(name);
-            }
-        }
+      res = true;
+    } else if (_fromGoto !== true) {
+      errorHandler.noRoute(name);
     }
-
-    return res;
+  }
+  return res;
 };
 
 /**
@@ -464,13 +437,13 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.goto = (name, opts = {}) => {
-    let res = Router.backTo(name, opts, true);
+  let res = Router.backTo(name, opts, true);
 
-    if (!res) {
-        res = Router.open(name, opts);
-    }
+  if (!res) {
+    res = Router.open(name, opts);
+  }
 
-    return res;
+  return res;
 };
 
 /**
@@ -479,42 +452,33 @@ Router.goto = (name, opts = {}) => {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.home = (opts = {}) => {
-    let currentView = getCurrentView();
-    let vcsLen = vcs.length;
+  const currentView = getCurrentView();
+  const vcsLen = vcs.length;
 
-    if (vcsLen > 1) {
-        // 暂存数据
-        activedParam = opts.param;
-        // 通知 Native
-        Bridge.backToReactVC({
-            // VC 标识
-            index: 0,
-            // 可选，安卓透明层标识（只有安卓才有）
-            adrToken: '',
-        });
-    }
+  if (vcsLen > 1) {
+    // 暂存数据
+    gActivedParam = opts.param;
+    // 通知 Native
+    Bridge.backToReactVC({
+      // VC 标识
+      index: 0,
+      // 可选，安卓透明层标识（只有安卓才有）
+      adrToken: '',
+    });
+  }
 
-    let {nav} = vcs[0];
-    let routes = nav.getCurrentRoutes();
+  const { nav } = vcs[0];
+  const routes = nav.getCurrentRoutes();
 
-    if (vcsLen === 1 && routes.length === 1) {
-        errorHandler.warn('当前就是历史第一页');
-        return false;
-    }
+  if (vcsLen === 1 && routes.length === 1) {
+    errorHandler.warn('当前就是历史第一页');
+    return false;
+  }
 
-    let nextRoute = routes[0];
-    let nextView = getViewByName(nextRoute.name);
+  nav.popToTop();
+  setSwipeBackEnabled(true, 0);
 
-    // 方法回退识别（与手势回退（右滑）区分）
-    nextRoute._isBackByFunction = true;
-
-    nav.popToTop();
-    setSwipeBackEnabled(true, 0);
-
-    nextView.em.trigger('actived', opts.param);
-    currentView.em.trigger('deactived');
-
-    return true;
+  return true;
 };
 
 /**
@@ -523,233 +487,221 @@ Router.home = (opts = {}) => {
  * @return {Boolean} 执行结果（true为成功 ，false 为失败）
  */
 Router.close = (name) => {
+  if (!name) {
+    return Router.back();
+  }
 
-    if (!name) {
-        return Router.back();
+  const theRouteInfo = getRouteInfoByName(name);
+  const theView = getViewByName(name);
+  let res = false;
+
+  if (theView) {
+    if (theRouteInfo) {
+      let { routeIndex, vcIndex } = theRouteInfo;
+      const nav = vcs[vcIndex].nav;
+      const routes = nav.getCurrentRoutes();
+
+      if (vcIndex === vcs.length - 1 && routeIndex === routes.length - 1) {
+        // 如果关闭的是当前页面，则做 back
+        res = Router.back();
+      } else {
+        routes.splice(routeIndex, 1);
+        nav.immediatelyResetRouteStack(routes);
+        checkAndOpenSwipeBack(vcIndex);
+
+        res = true;
+      }
+    } else {
+      errorHandler.noRoute(name);
     }
+  }
 
-    let theRouteInfo = getRouteInfoByName(name),
-        theView = getViewByName(name),
-        res = false;
+  return res;
+};
 
-    if (theView) {
-        if (theRouteInfo) {
-            let {routeIndex, vcIndex} = theRouteInfo;
-            let nav = vcs[vcIndex].nav;
-            let routes = nav.getCurrentRoutes();
-
-            if (vcIndex === vcs.length - 1 && routeIndex === routes.length - 1) {
-                // 如果关闭的是当前页面，则做 back
-                res = Router.back();
-            } else {
-                routes.splice(routeIndex, 1);
-                nav.immediatelyResetRouteStack(routes);
-                checkAndOpenSwipeBack(vcIndex);
-
-                res = true;
-            }
-        } else {
-            errorHandler.noRoute(name);
-        }
-    }
-
-    return res;
-}
-
-/*************************
+/** ***********************
  * Native Bridge
  ************************/
 ReactNative.DeviceEventEmitter.addListener('onShow', (data) => {
-    // 如果是返回操作，此时 Navigator 的 componentWillUnmount 还未执行，所以 vcs 还未变少
-    let index = data.index;
+  // 如果是返回操作，此时 Navigator 的 componentWillUnmount 还未执行，所以 vcs 还未变少
+  const index = data.index;
 
-    if (index >= vcs.length || index < 0 || !vcs[index]) {
-        return;
-    }
+  if (index >= vcs.length || index < 0 || !vcs[index]) {
+    return;
+  }
 
-    let routes = vcs[index].nav.getCurrentRoutes();
-    let routesLen = routes.length;
+  const routes = vcs[index].nav.getCurrentRoutes();
+  const routesLen = routes.length;
 
-    if (routesLen === 0) {
-        closeCurrentVC();
-        return;
-    }
+  // 如果该 vc 没有页面了
+  if (routesLen === 0) {
+    closeCurrentVC();
+    return;
+  }
 
-    let route = routes[routesLen - 1];
-    let view = getViewByName(route.name);
+  const route = routes[routesLen - 1];
+  const view = getViewByName(route.name);
 
-    view.em.trigger('actived', activedParam || {});
-    activedParam = null;
+  view.em.trigger('actived', gActivedParam || {});
+  gActivedParam = null;
 });
 ReactNative.DeviceEventEmitter.addListener('onHide', (data) => {
-    let index = data.index;
+  const index = data.index;
 
-    if (index >= vcs.length) {
-        return;
-    }
+  if (index >= vcs.length) {
+    return;
+  }
 
-    let routes = vcs[index].nav.getCurrentRoutes();
-    let routesLen = routes.length;
+  const routes = vcs[index].nav.getCurrentRoutes();
+  const routesLen = routes.length;
 
-    if (routesLen > 0) {
-        let view = getViewByName(routes[routesLen - 1].name);
-        view.em.trigger('deactived');
-    }
+  if (routesLen > 0) {
+    const view = getViewByName(routes[routesLen - 1].name);
+    view.em.trigger('deactived');
+  }
 });
-/**
- * 兼容以前错误 scheme 拼写
- * TODO: 下个版本删除
- */
-ReactNative.DeviceEventEmitter.addListener('receiveSchema', (res) => {
-    console.warn('receiveSchema 已废弃，请升级 QRN');
-    receiveSchemeCB(res);
-});
+
 ReactNative.DeviceEventEmitter.addListener('receiveScheme', receiveSchemeCB);
 
 function receiveSchemeCB(res) {
-   let data = res.data;
-   let ret = false;
+  const data = res.data;
+  let ret = false;
 
-   mergeDataFromUrl(res.url);
+  mergeDataFromUrl(res.url);
 
    // 如果没有设置 projectId，帮他设置下
-   if (!RNPlus.defaults.projectId) {
-       RNPlus.defaults.projectId = data.projectId;
-   }
+  if (!RNPlus.defaults.projectId) {
+    RNPlus.defaults.projectId = data.projectId;
+  }
 
    // 是否需要 rnplus 处理
-   if (data.rnplus === false) {
-       return;
-   }
+  if (data.rnplus === false) {
+    return;
+  }
 
-   if (data.forceOpen === true) {
-       openVC();
-   } else {
+  if (data.forceOpen === true) {
+    openVC();
+  } else {
+    ret = myBackTo(data.qInitView);
 
-       ret = myBackTo(data.qInitView);
+    if (!ret) {
+      // 返回失败
+      openVC();
+    }
+  }
 
-       if (!ret) {
-           // 返回失败
-           openVC();
-       }
-
-   }
-
-   if (ret) {
-       Bridge.sendNativeEvents({
-           id: res.callbackId,
-           data: {
-               ret,
-               msg: '成功'
-           },
-       });
-   } else {
-       Bridge.sendNativeEvents({
-           id: res.callbackId,
-           data: {
-               ret,
-               msg: '失败'
-           },
-       });
-   }
+  if (ret) {
+    Bridge.sendNativeEvents({
+      id: res.callbackId,
+      data: {
+        ret,
+        msg: '成功',
+      },
+    });
+  } else {
+    Bridge.sendNativeEvents({
+      id: res.callbackId,
+      data: {
+        ret,
+        msg: '失败',
+      },
+    });
+  }
 
    // only in android
-   Bridge.closeActivityAndroid(res.adrToken);
+  Bridge.closeActivityAndroid(res.adrToken);
 
-   function openVC() {
-       var openNewVCData = data.initProps || {};
+  function openVC() {
+    const openNewVCData = data.initProps || {};
 
-       if (data.qInitView) {
-           openNewVCData.qInitView = data.qInitView
-       }
+    if (data.qInitView) {
+      openNewVCData.qInitView = data.qInitView;
+    }
 
-       Bridge.openNewVC({
-           data: openNewVCData,
-       });
+    Bridge.openNewVC({
+      data: openNewVCData,
+    });
 
-       ret = true;
-   }
+    ret = true;
+  }
 
-   function myBackTo(name) {
+  function myBackTo(name) {
+    if (!name) {
+      return false;
+    }
 
-       if (!name) {
-           return false;
-       }
+    const currentView = getCurrentView();
+    const nextRouteInfo = getRouteInfoByName(name);
+    const nextView = getViewByName(name);
+    let res = false;
 
-       let currentView = getCurrentView(),
-           nextRouteInfo = getRouteInfoByName(name),
-           nextView = getViewByName(name),
-           res = false;
+    if (nextView) {
+      if (nextRouteInfo) {
+        // 暂存数据
+        gActivedParam = (data.initProps && data.initProps.param) || {};
 
-       if (nextView) {
-           if (nextRouteInfo) {
-               // 暂存数据
-               activedParam = (data.initProps && data.initProps.param) || {};
+        if (currentView === nextView) {
+          Bridge.backToReactVC({
+            // VC 标识
+            index: vcs.length - 1,
+            // 可选，安卓透明层标识（只有安卓才有）
+            adrToken: '',
+          });
+        } else {
+          const { route, routeIndex, vcIndex } = nextRouteInfo;
+          const { nav } = vcs[vcIndex];
 
-               if (currentView === nextView) {
-                   Bridge.backToReactVC({
-                       // VC 标识
-                       index: vcs.length - 1,
-                       // 可选，安卓透明层标识（只有安卓才有）
-                       adrToken: '',
-                   });
-               } else {
-                   let {route, routeIndex, vcIndex} = nextRouteInfo;
-                   let {nav} = vcs[vcIndex];
+          // 方法回退识别（与手势回退（右滑）区分）
+          route.isBackByFunction = true;
 
-                   // 方法回退识别（与手势回退（右滑）区分）
-                   route._isBackByFunction = true;
+          // MAIN: 调用原生 API，路由回退
+          nav.popToRoute(route);
+          // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
+          nav._cleanScenesPastIndex(routeIndex);
 
-                   // MAIN: 调用原生 API，路由回退
-                   nav.popToRoute(route);
-                   // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
-                   nav._cleanScenesPastIndex(routeIndex);
+          // 通知 Native
+          Bridge.backToReactVC({
+            // VC 标识
+            index: vcIndex,
+            // 可选，安卓透明层标识（只有安卓才有）
+            adrToken: '',
+          });
+        }
 
-                   // 通知 Native
-                   Bridge.backToReactVC({
-                       // VC 标识
-                       index: vcIndex,
-                       // 可选，安卓透明层标识（只有安卓才有）
-                       adrToken: '',
-                   });
-               }
+        res = true;
+      }
+    }
 
-               res = true;
-           }
-       }
+    return res;
+  }
 
-       return res;
-   }
+  /**
+   * 从 url 上获取数据并 合并到 res.data 上
+   * @param  {String} url - Scheme 的 url
+   */
+  function mergeDataFromUrl(url) {
+    const search = url.split('?')[1];
 
-   /**
-    * 从 url 上获取数据并 合并到 res.data 上
-    * @param  {String} url - Scheme 的 url
-    */
-   function mergeDataFromUrl(url) {
-       let search = url.split('?')[1];
+    if (search) {
+      const pairs = search.split('&');
 
-       if (search) {
-           let pairs = search.split('&');
+      pairs.forEach((pair) => {
+        const pairArr = pair.split('=');
+        const key = pairArr[0];
+        let value = decodeURIComponent(pairArr[1]);
 
-           pairs.forEach((pair) => {
-               let pairArr = pair.split('=');
-               let key = pairArr[0];
-               let value = decodeURIComponent(pairArr[1]);
+        try {
+          value = JSON.parse(value);
+        } catch (e) {}
 
-               try {
-                   value = JSON.parse(value);
-               } catch(e) {
-
-               }
-
-               // url 的优先级高于 data
-               data[key] = value;
-           });
-       }
-   }
+        // url 的优先级高于 data
+        data[key] = value;
+      });
+    }
+  }
 }
 
-/*************************
+/** ***********************
  * 工具类方法
  ************************/
 /**
@@ -757,23 +709,23 @@ function receiveSchemeCB(res) {
  * @return {Object} VC 对象
  */
 function getCurrentVC() {
-    return vcs[vcs.length - 1];
+  return vcs[vcs.length - 1];
 }
 /**
  * 获取当前 view
  * @return {Route} 当前 route
  */
 function getCurrentView() {
-    let route = getCurrentRoute();
-    return getViewByName(route.name);
+  const route = getCurrentRoute();
+  return getViewByName(route.name);
 }
 /**
  * 获取当前 route
  * @return {Route} 当前 route
  */
 function getCurrentRoute() {
-    let routes = getCurrentVC().nav.getCurrentRoutes();
-    return routes[routes.length - 1];
+  const routes = getCurrentVC().nav.getCurrentRoutes();
+  return routes[routes.length - 1];
 }
 /**
  * 根据页面名字获取页面
@@ -781,13 +733,13 @@ function getCurrentRoute() {
  * @return {View}        页面
  */
 function getViewByName(name) {
-    let view = views[name];
+  const view = views[name];
 
-    if (!view) {
-        errorHandler.noView(name);
-    }
+  if (!view) {
+    errorHandler.noView(name);
+  }
 
-    return view;
+  return view;
 }
 /**
  * 根据页面名字获取页面所在路由的信息
@@ -795,58 +747,58 @@ function getViewByName(name) {
  * @return {Object}      页面所在路由（route 为路由对象，routeIndex 为所在 routes 的 index，vcIndex 为 routes 所在 vcs 的 index）,如果没有则返回 null
  */
 function getRouteInfoByName(name) {
-    let vcIndex = vcs.length;
+  let vcIndex = vcs.length;
 
-    while (vcIndex) {
-        vcIndex--;
+  while (vcIndex) {
+    vcIndex -= 1;
 
-        let routes = vcs[vcIndex].nav.getCurrentRoutes();
-        let routeIndex = routes.length;
+    const routes = vcs[vcIndex].nav.getCurrentRoutes();
+    let routeIndex = routes.length;
 
-        while (routeIndex) {
-            routeIndex--;
+    while (routeIndex) {
+      routeIndex -= 1;
 
-            let route = routes[routeIndex];
-            if (route.name === name) {
-                return {
-                    route,
-                    routeIndex,
-                    vcIndex,
-                };
-            }
-        }
+      const route = routes[routeIndex];
+      if (route.name === name) {
+        return {
+          route,
+          routeIndex,
+          vcIndex,
+        };
+      }
     }
+  }
 
-    return null;
+  return null;
 }
 /**
  * 关闭当前 VC
  * @return {[type]} [description]
  */
 function closeCurrentVC() {
-    Bridge.closeCurrentVC();
+  Bridge.closeCurrentVC();
 }
 /**
  * 设置返回手势开关
  * @param {Boolean} isEnabled 开关
  */
 function setSwipeBackEnabled(isEnabled, vcIndex) {
-    if (vcIndex === undefined) {
-        vcIndex = vcs.length - 1;
-    }
-    Bridge.setSwipeBackEnabled(isEnabled, vcIndex);
+  if (vcIndex === undefined) {
+    vcIndex = vcs.length - 1;
+  }
+  Bridge.setSwipeBackEnabled(isEnabled, vcIndex);
 }
 function checkAndOpenSwipeBack(vcIndex) {
-    if (vcIndex === undefined) {
-        vcIndex = vcs.length - 1;
-    }
-    if (vcIndex < 0 || !vcs[vcIndex]) {
-        return;
-    }
-    let routes = vcs[vcIndex].nav.getCurrentRoutes();
-    if (routes.length === 1) {
-        setSwipeBackEnabled(true);
-    }
+  if (vcIndex === undefined) {
+    vcIndex = vcs.length - 1;
+  }
+  if (vcIndex < 0 || !vcs[vcIndex]) {
+    return;
+  }
+  const routes = vcs[vcIndex].nav.getCurrentRoutes();
+  if (routes.length === 1) {
+    setSwipeBackEnabled(true);
+  }
 }
 
 // @redux 强行包裹 Router.open 方法
@@ -868,7 +820,11 @@ RNPlus.close = Router.close;
 
 // @redux 给每个页面插入一个 hashKey
 // 主要是 android 好像不支持 symbol
-const getCurrentHashKey = () => getCurrentRoute().hashKey;
-const getHashKey = () => Math.random().toString(32) + +new Date;
+function getCurrentHashKey() {
+  return getCurrentRoute().hashKey;
+}
+function getHashKey() {
+  return Math.random().toString(32) + +new Date();
+}
 
 export default Router;

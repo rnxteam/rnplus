@@ -13,4 +13,4 @@ export default RNPlus;
 export {
     PView,
     PComponent,
-}
+};
