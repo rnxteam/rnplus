@@ -3,6 +3,7 @@ import React, {
   PropTypes,
 } from 'react';
 import ReactNative, {
+  AppState,
   Navigator,
   AppRegistry,
   View,
@@ -50,10 +51,24 @@ class NavComp extends Component {
     this.indexName = this.getIndexName();
     this.currentView = getViewByName(this.indexName);
 
+    /**
+     * 处理应用状态变化
+     * todo: 当前逻辑在多 RN VC 环境下可能存在问题
+     */
+    const onAppStateChange = RNPlus.defaults.router.onAppStateChange;
+    if (typeof onAppStateChange === 'function') {
+      this.onAppStateChange = onAppStateChange;
+    } else {
+      this.onAppStateChange = () => {};
+    }
+
     this.onDidFocus = this.onDidFocus.bind(this);
   }
 
   componentDidMount() {
+    // 处理应用状态变化
+    AppState.addEventListener('change', this.onAppStateChange);
+
     if (this.indexName) {
       const view = getViewByName(this.indexName);
       const param = getCurrentRoute().opts.param;
@@ -67,6 +82,9 @@ class NavComp extends Component {
     }
   }
   componentWillUnmount() {
+    // 处理应用状态变化
+    AppState.removeEventListener('change', this.onAppStateChange);
+
     const vcIndex = vcs.indexOf(this.vc);
 
     if (vcIndex > -1) {
