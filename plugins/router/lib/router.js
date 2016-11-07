@@ -730,12 +730,20 @@ function getCurrentVC() {
   return vcs[vcs.length - 1];
 }
 /**
+ * 获取当前 viewName
+ * @return {String} 当前页面名字
+ */
+function getCurrentViewName() {
+  const route = getCurrentRoute();
+  return route.name;
+}
+/**
  * 获取当前 view
  * @return {Route} 当前 route
  */
 function getCurrentView() {
-  const route = getCurrentRoute();
-  return getViewByName(route.name);
+  const viewName = getCurrentViewName();
+  return getViewByName(viewName);
 }
 /**
  * 获取当前 route
@@ -826,6 +834,7 @@ mixRedux.wrapperRouter(Router);
 Router.Bridge = Bridge;
 Router._views = views;
 Router._vcs = vcs;
+Router.getCurrentViewName = getCurrentViewName;
 
 RNPlus.Router = Router;
 
