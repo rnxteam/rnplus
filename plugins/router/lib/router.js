@@ -380,7 +380,7 @@ Router.open = (name, opts = {}) => {
  * [API] back
  * @param  {String} name 页面名字
  * @param  {Object} opts 参数
- * @return {Boolean} 执行结果（true为成功 ，false 为失败）
+ * @return {Boolean} 执行结果（true 为成功 ，false 为失败）
  */
 Router.back = (opts = {}) => {
   const { nav } = getCurrentVC();
@@ -397,8 +397,10 @@ Router.back = (opts = {}) => {
     res = true;
   } else {
     // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
-    closeCurrentVC();
-    res = true;
+    if (vcs.length > 1) {
+      closeCurrentVC();
+      res = true;
+    }
   }
 
   return res;
@@ -409,7 +411,7 @@ Router.back = (opts = {}) => {
  * @param  {String} name 页面名字
  * @param  {Object} opts 参数
  * @param  {Object} _fromGoto 来自内部方法 Router.goto 的标志
- * @return {Boolean} 执行结果（true为成功 ，false 为失败）
+ * @return {Boolean} 执行结果（true 为成功 ，false 为失败）
  */
 Router.backTo = (name, opts = {}, _fromGoto) => {
   const currentView = getCurrentView();
