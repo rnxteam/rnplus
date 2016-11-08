@@ -43,6 +43,11 @@ const isQReact = !!ReactNative.NativeModules.QRCTDeviceInfo;
 // 暂存 actived 参数
 let gActivedParam = {};
 
+// 添加自定义动画
+Navigator.SceneConfigs.PushFromRightNoGestures = {
+  ...Navigator.SceneConfigs.PushFromRight,
+  gestures: {},
+};
 
 class NavComp extends Component {
   constructor(props) {
@@ -118,17 +123,25 @@ class NavComp extends Component {
   }
 
   configureScene(route) {
-    // 动画种类
-    // PushFromRight
-    // FloatFromRight
-    // FloatFromLeft
-    // FloatFromBottom
-    // FloatFromBottomAndroid
-    // FadeAndroid
-    // HorizontalSwipeJump
-    // HorizontalSwipeJumpFromRight
-    // VerticalUpSwipeJump
-    // VerticalDownSwipeJump
+    /**
+     * 动画种类
+     *
+     * == 原生动画 ==
+     * PushFromRight
+     * FloatFromRight
+     * FloatFromLeft
+     * FloatFromBottom
+     * FloatFromBottomAndroid
+     * FadeAndroid
+     * HorizontalSwipeJump
+     * HorizontalSwipeJumpFromRight
+     * VerticalUpSwipeJump
+     * VerticalDownSwipeJump
+     * == RNPlus 动画 ==
+     * PushFromRightNoGestures
+     * @param  {[type]} sceneConfig [description]
+     * @return {[type]}             [description]
+     */
     function getSceneConfig(sceneConfig) {
       const sceneConfigsType = typeof sceneConfig;
 
