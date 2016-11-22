@@ -60,7 +60,8 @@ class NavComp extends Component {
      * 处理应用状态变化
      * todo: 当前逻辑在多 RN VC 环境下可能存在问题
      */
-    const onAppStateChange = RNPlus.defaults.router.onAppStateChange;
+    const routerOpts = RNPlus.defaults.router || {};
+    const onAppStateChange = routerOpts.onAppStateChange;
     if (typeof onAppStateChange === 'function') {
       this.onAppStateChange = onAppStateChange;
     } else {
