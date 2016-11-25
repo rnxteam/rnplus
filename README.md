@@ -3,7 +3,7 @@ RNPlus
 
 RNPlus 是 React Native 的前端拓展框架，简化并增强前端开发。
 
-> 配合使用 [rnxDemo](https://github.com/dragonwong/rnxDemo)，阅读该文档，风味更加哦～
+> 配合使用 [rnxDemo](https://github.com/dragonwong/rnxDemo)，阅读该文档，风味更佳哦～
 
 ## 介绍
 
