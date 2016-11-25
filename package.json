@@ -2,6 +2,11 @@
   "name": "rnplus",
   "version": "0.30.0",
   "description": "React Native Plus",
+  "keywords": [
+    "rnx",
+    "rnplus",
+    "react-native"
+  ],
   "dependencies": {
     "babel-plugin-rnplus": "git+ssh://git@git.jimubox.com/react-native/babel-plugin-rnplus.git"
   },
