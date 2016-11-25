@@ -1,7 +1,5 @@
 # Router - RNPlus Plugin
 
-> 配合使用 [rnxDemo](http://git.jimubox.com/react-native/rnxDemo)，阅读该文档，风味更加哦～
-
 ## 介绍
 
 **Router** 作为 **RNPlus** 的内置插件，为其提供更加强大好用的路由功能。
