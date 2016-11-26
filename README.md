@@ -1,6 +1,9 @@
 RNPlus
 ===
 
+[![npm](https://img.shields.io/npm/v/rnplus.svg?maxAge=2592000)](https://www.npmjs.com/package/rnplus)
+[![npm](https://img.shields.io/npm/dt/rnplus.svg?maxAge=2592000)](https://www.npmjs.com/package/rnplus)
+
 RNPlus 是 React Native 的前端拓展框架，简化并增强前端开发。
 
 > 配合使用 [rnxDemo](https://github.com/dragonwong/rnxDemo)，阅读该文档，风味更佳哦～
