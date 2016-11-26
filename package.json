@@ -1,6 +1,6 @@
 {
   "name": "rnplus",
-  "version": "0.30.0",
+  "version": "0.30.1",
   "description": "React Native Plus",
   "keywords": [
     "rnx",
@@ -8,7 +8,7 @@
     "react-native"
   ],
   "dependencies": {
-    "babel-plugin-rnplus": "git+ssh://git@git.jimubox.com/react-native/babel-plugin-rnplus.git"
+    "babel-plugin-rnplus": "*"
   },
   "devDependencies": {
     "eslint-config-pintec": "*"
