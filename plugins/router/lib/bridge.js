@@ -5,11 +5,6 @@ let Bridge = {
     sendBroadcast(opts) {
         callNativeAPI('QRCTBroadCastManager', 'sendBroadcast', [opts.name, opts.data, opts.projectId || '']);
     },
-    // 发送 schema
-    sendSchema(opts, cb = () => {}) {
-        console.warn('sendSchema 已纠正为 sendScheme，下个版本将不支持，请升级 QRN');
-        callNativeAPI('QRCTJumpHandleManager', 'sendSchema', [opts.url, opts.data, opts.adrToken || '', cb]);
-    },
     // 发送 scheme
     sendScheme(opts, cb = () => {}) {
         callNativeAPI('QRCTJumpHandleManager', 'sendScheme', [opts.url, opts.data, opts.adrToken || '', cb]);

@@ -553,7 +553,7 @@ Router.close = (name) => {
   return res;
 };
 
-/** ***********************
+/*************************
  * Native Bridge
  ************************/
 ReactNative.DeviceEventEmitter.addListener('onShow', (data) => {

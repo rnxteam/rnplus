@@ -1,4 +1,4 @@
-import promiseMiddleware from './promise'
-import thunkMiddleware from './thunk'
+import promiseMiddleware from './promise';
+import thunkMiddleware from './thunk';
 
-export default [promiseMiddleware, thunkMiddleware]
+export default [promiseMiddleware, thunkMiddleware];

@@ -11,6 +11,6 @@ RNPlus.defaults.globalPlugins = ['redux', 'router'];
 
 export default RNPlus;
 export {
-    PView,
-    PComponent,
+  PView,
+  PComponent,
 };
