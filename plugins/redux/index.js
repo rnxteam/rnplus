@@ -6,20 +6,11 @@ import bindActionCreators from './lib/redux/bindActionCreators';
 import invariant from './lib/utils/invariant';
 
 const {
-    isArray,
-    isPlainObject,
-    isString,
-    noop,
+  isArray,
+  isPlainObject,
+  isString,
+  noop,
 } = RNPlus.utils;
-
-RNPlus.Redux = {
-  defineStore,
-  combineReducers,
-  bindActionCreators,
-  compose,
-  usingRedux,
-  invariant,
-};
 
 function usingRedux() {
   return RNPlus.defaults.redux && RNPlus.defaults.redux.reducer;
@@ -50,16 +41,16 @@ function mergeOpts(opts = {}) {
     opts.mapStateToProps = (state) => {
       return states.reduce((prev, current) => {
         invariant(
-                    isString(current),
-                    'mapStateToProps 数组内容应为字符串，但你输入的是 %s。',
-                    current
-                );
+          isString(current),
+          'mapStateToProps 数组内容应为字符串，但你输入的是 %s。',
+          current
+        );
         const matched = current.match(/[^\.]+$/);
         invariant(
-                    isArray(matched),
-                    '%s 最后一个 \'.\' 的后面应为一个合法属性名。',
-                    current
-                );
+          isArray(matched),
+          '%s 最后一个 \'.\' 的后面应为一个合法属性名。',
+          current
+        );
         prev[matched[0]] = visitState(state, current);
         return prev;
       }, {});
@@ -86,9 +77,9 @@ RNPlus.addPlugin('redux', noop, noop, (Component, isView, plugins, name) => {
 
   if (plugins.indexOf('redux') !== -1 && !usingRedux()) {
     invariant(
-            !isPlainObject(options),
-            '如果想使用 redux 插件，请至少配置 \'RNPlus.defaults.redux\' 的 \'reducer\' 属性。'
-        );
+      !isPlainObject(options),
+      '如果想使用 redux 插件，请至少配置 \'RNPlus.defaults.redux\' 的 \'reducer\' 属性。'
+    );
     return Component;
   }
 
@@ -106,9 +97,18 @@ RNPlus.addPlugin('redux', noop, noop, (Component, isView, plugins, name) => {
   const opts = mergeOpts(options);
 
   return connect(
-        opts.mapStateToProps,
-        opts.mapDispatchToProps,
-        opts.mergeProps,
-        opts.options
-    )(Component);
+    opts.mapStateToProps,
+    opts.mapDispatchToProps,
+    opts.mergeProps,
+    opts.options
+  )(Component);
 });
+
+RNPlus.Redux = {
+  defineStore,
+  combineReducers,
+  bindActionCreators,
+  compose,
+  usingRedux,
+  invariant,
+};

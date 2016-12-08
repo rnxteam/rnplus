@@ -7,5 +7,5 @@
  * @since   2016/2/24
  */
 
-import './lib/router.js';
+import './lib';
 import './plugins/popup.js';
