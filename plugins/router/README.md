@@ -181,7 +181,7 @@ class base extends PView {
 
 ##### `ready()`
 
-页面准备完成时。通过 `this.porps.param` 可以获取 `open(name, opts)` 时传入的参数。
+页面准备完成时。通过 `this.props.param` 可以获取 `open(name, opts)` 时传入的参数。
 
 > 举例：从 A 页面打开 B 页面，此时 B 页面就准备完成了。
 
