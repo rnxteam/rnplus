@@ -524,13 +524,14 @@ Router.back = (opts = {}) => {
 
   if (routes.length > 1) {
     // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
+    gActivedParam = opts.param;
     nav.pop();
     checkAndOpenSwipeBack();
-    gActivedParam = opts.param;
 
     res = true;
   } else if (vcs.length > 1) {
     // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
+    gActivedParam = opts.param;
     closeCurrentVC();
     res = true;
   }
@@ -555,13 +556,13 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       const { route, vcIndex } = nextRouteInfo;
       const { nav } = vcs[vcIndex];
 
+      gActivedParam = opts.param;
       // MAIN: 调用原生 API，路由回退
       nav.popToRoute(route);
 
       // QReact
       if (vcIndex < vcs.length - 1) {
         // 暂存数据
-        gActivedParam = opts.param;
         // 通知 Native
         Bridge.backToReactVC({
           // VC 标识
