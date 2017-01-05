@@ -39,8 +39,14 @@ const vcs = [];
 const views = {};
 // 是否是 rnx 环境
 const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
+
+/**
+ * 一次性消费
+ */
 // 暂存 actived 参数
 let gActivedParam = {};
+// immediatelyResetRouteStack 会触发 onDidFocus
+let hasResetResetRouteStack = false;
 
 // 添加自定义动画
 Navigator.SceneConfigs.PushFromRightNoGestures = {
@@ -175,7 +181,7 @@ class NavComp extends Component {
     super(props);
 
     this.indexName = this.getIndexName();
-    this.currentView = getViewByName(this.indexName);
+    this.currentView = null;
 
     /**
      * 处理应用状态变化
@@ -226,6 +232,10 @@ class NavComp extends Component {
   }
 
   onDidFocus() {
+    if (hasResetResetRouteStack) {
+      hasResetResetRouteStack = false;
+      return;
+    }
     // 左划返回
     // setTimeout 是因为此时 routes 还没减少
     // setTimeout(() => {
@@ -657,7 +667,10 @@ Router.close = (name) => {
         res = Router.back();
       } else {
         routes.splice(routeIndex, 1);
+
+        hasResetResetRouteStack = true;
         nav.immediatelyResetRouteStack(routes);
+
         checkAndOpenSwipeBack(vcIndex);
 
         res = true;
