@@ -686,10 +686,8 @@ Router.close = (name) => {
 /**
  * Native Bridge
  */
-ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (data) => {
+ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
   // 如果是返回操作，此时 Navigator 的 componentWillUnmount 还未执行，所以 vcs 还未变少
-  const index = data.index;
-
   if (index >= vcs.length || index < 0 || !vcs[index]) {
     return;
   }
@@ -709,10 +707,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (data) => {
   view.em.trigger('actived', gActivedParam || {});
   gActivedParam = null;
 });
-ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (data) => {
-  const index = data.index;
-
-  if (index >= vcs.length) {
+ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
+  if (index >= vcs.length || index < 0 || !vcs[index]) {
     return;
   }
 

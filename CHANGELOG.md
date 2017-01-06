@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.5
+
+- `rnx_internal_onHide` 和 `rnx_internal_onHide` 参数修正
+
 ## 0.30.4
 
 - 修正首页自动触发一次 `deactived` 的 bug
