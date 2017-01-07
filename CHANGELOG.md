@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.30.6
+## 0.30.7
 
 新增 Navigator 动画样式 `None`
 
