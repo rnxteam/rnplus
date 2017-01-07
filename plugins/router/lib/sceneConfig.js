@@ -4,7 +4,7 @@
 import {
   Navigator,
 } from 'react-native';
-const buildStyleInterpolator = require('buildStyleInterpolator');
+const buildStyleInterpolator = require('react-native/Libraries/Utilities/buildStyleInterpolator.js');
 
 const NO_TRANSITION = {
   opacity: {
