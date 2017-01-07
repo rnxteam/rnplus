@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.6
+
+新增 Navigator 动画样式 `None`
+
 ## 0.30.5
 
 - `rnx_internal_onHide` 和 `rnx_internal_onHide` 参数修正

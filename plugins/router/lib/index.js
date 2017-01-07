@@ -9,6 +9,7 @@ import ReactNative, {
   View,
 } from 'react-native';
 
+import './sceneConfig';
 import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
@@ -47,12 +48,6 @@ const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
 let gActivedParam = {};
 // immediatelyResetRouteStack 会触发 onDidFocus
 let hasResetResetRouteStack = false;
-
-// 添加自定义动画
-Navigator.SceneConfigs.PushFromRightNoGestures = {
-  ...Navigator.SceneConfigs.PushFromRight,
-  gestures: {},
-};
 
 /**
  * 工具类方法
