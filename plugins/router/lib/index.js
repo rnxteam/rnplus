@@ -274,21 +274,8 @@ class NavComp extends Component {
 
   configureScene(route) {
     /**
-     * 动画种类
-     *
-     * == 原生动画 ==
-     * PushFromRight
-     * FloatFromRight
-     * FloatFromLeft
-     * FloatFromBottom
-     * FloatFromBottomAndroid
-     * FadeAndroid
-     * HorizontalSwipeJump
-     * HorizontalSwipeJumpFromRight
-     * VerticalUpSwipeJump
-     * VerticalDownSwipeJump
-     * == RNPlus 动画 ==
      * PushFromRightNoGestures
+     * 动画名字请参考 ./sceneConfig.js 文件
      * @param  {[type]} sceneConfig [description]
      * @return {[type]}             [description]
      */
