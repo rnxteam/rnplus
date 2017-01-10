@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.9
+
+新增 Navigator 动画样式 `FloatFromBottomNoGestures`
+
 ## 0.30.8
 
 修正 Navigator 动画样式 `None` 在 iPhone 6s Plus 等机型渲染白屏的 bug

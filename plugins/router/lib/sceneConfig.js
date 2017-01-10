@@ -36,6 +36,11 @@ Navigator.SceneConfigs.PushFromRightNoGestures = {
   ...Navigator.SceneConfigs.PushFromRight,
   gestures: {},
 };
+// 禁用手势的底入动画
+Navigator.SceneConfigs.FloatFromBottomNoGestures = {
+  ...Navigator.SceneConfigs.FloatFromBottom,
+  gestures: {},
+};
 // 啥子都没得的动画
 Navigator.SceneConfigs.None = {
   ...Navigator.SceneConfigs.FadeAndroid,
