@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.10
+
+- 新增 API `resetTo`
+- 修改 `open`、`goto`：通过配置 `replace` 属性为 `true` 可以替换当前页
+
 ## 0.30.9
 
 新增 Navigator 动画样式 `FloatFromBottomNoGestures`

@@ -485,8 +485,9 @@ Router.open = (name, opts = {}) => {
 
   if (nextView) {
     const { nav } = getCurrentVC();
+    const method = opts.replace ? 'replace' : 'push';
 
-    nav.push({
+    nav[method]({
       name,
       opts,
       routerPlugin: nextView.Component.routerPlugin,
@@ -664,7 +665,36 @@ Router.close = (name) => {
 
   return res;
 };
+/**
+ * [API] resetTo
+ * 跳转到新的场景，并且重置整个路由栈
+ * 只能用于单 VC 环境！！！
+ * @param  {String} name 页面名字
+ * @return {Boolean} 执行结果（true为成功 ，false 为失败）
+ */
+Router.resetTo = (name, opts = {}) => {
+  const nextView = getViewByName(name);
+  let res = false;
 
+  if (nextView) {
+    const { nav } = getCurrentVC();
+
+    nav.resetTo({
+      name,
+      opts,
+      routerPlugin: nextView.Component.routerPlugin,
+      hashKey: getHashKey(),
+    });
+
+    setSwipeBackEnabled(false);
+
+    gActivedParam = opts.param;
+
+    res = true;
+  }
+
+  return res;
+};
 /**
  * Native Bridge
  */
@@ -898,5 +928,6 @@ RNPlus.backTo = Router.backTo;
 RNPlus.goto = Router.goto;
 RNPlus.home = Router.home;
 RNPlus.close = Router.close;
+RNPlus.resetTo = Router.resetTo;
 
 export default Router;
