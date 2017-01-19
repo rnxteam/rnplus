@@ -190,6 +190,7 @@ class NavComp extends Component {
       this.onAppStateChange = () => {};
     }
 
+    this.renderScene = this.renderScene.bind(this);
     this.onDidFocus = this.onDidFocus.bind(this);
   }
 
