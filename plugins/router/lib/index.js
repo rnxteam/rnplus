@@ -488,6 +488,8 @@ Router.open = (name, opts = {}) => {
     const { nav } = getCurrentVC();
     const method = opts.replace ? 'replace' : 'push';
 
+    gActivedParam = opts.param;
+
     nav[method]({
       name,
       opts,
@@ -496,8 +498,6 @@ Router.open = (name, opts = {}) => {
     });
 
     setSwipeBackEnabled(false);
-
-    gActivedParam = opts.param;
 
     res = true;
   }
