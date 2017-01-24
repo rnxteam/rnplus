@@ -49,6 +49,8 @@ let gActivedParam = {};
 // immediatelyResetRouteStack 会触发 onDidFocus
 let hasResetResetRouteStack = false;
 
+const NOOP = () => {};
+
 /**
  * 工具类方法
  */
@@ -182,12 +184,12 @@ class NavComp extends Component {
      * 处理应用状态变化
      * todo: 当前逻辑在多 RN VC 环境下可能存在问题
      */
-    const routerOpts = RNPlus.defaults.router || {};
-    const onAppStateChange = routerOpts.onAppStateChange;
+    this.routerOpts = RNPlus.defaults.router || {};
+    const onAppStateChange = this.routerOpts.onAppStateChange;
     if (typeof onAppStateChange === 'function') {
-      this.onAppStateChange = onAppStateChange;
+      this.onAppStateChange = onAppStateChange.bind(this);
     } else {
-      this.onAppStateChange = () => {};
+      this.onAppStateChange = NOOP.bind(this);
     }
 
     this.renderScene = this.renderScene.bind(this);
@@ -243,16 +245,25 @@ class NavComp extends Component {
     }
 
     const prevView = this.currentView;
-
     this.currentView = getCurrentView();
 
-    // 触发前一页面的 deactived
-    if (prevView) {
-      prevView.em.trigger('deactived');
+    // 用户骚微滑动下（没有回退）也会触发，需要防御下
+    if (prevView !== this.currentView) {
+      // 触发前一页面的 deactived
+      if (prevView) {
+        prevView.em.trigger('deactived');
+      }
+      // 触发当前页面的 actived
+      this.currentView.em.trigger('actived', gActivedParam || {});
+
+      // 全局激活处理
+      const globalActived = this.routerOpts.actived;
+      if (typeof globalActived === 'function') {
+        globalActived(this.currentView, gActivedParam);
+      }
+
+      gActivedParam = null;
     }
-    // 触发当前页面的 actived
-    this.currentView.em.trigger('actived', gActivedParam || {});
-    gActivedParam = null;
   }
 
   getIndexName() {
@@ -344,16 +355,8 @@ class NavComp extends Component {
         param: this.props.param,
       };
 
-      const routerOpts = RNPlus.defaults.router || {};
-      let navigationBar = null;
-      let moreComponents = null;
-
-      if (routerOpts.navigationBar) {
-        navigationBar = routerOpts.navigationBar;
-      }
-      if (routerOpts.moreComponents) {
-        moreComponents = routerOpts.moreComponents;
-      }
+      const navigationBar = this.routerOpts.navigationBar || null;
+      const moreComponents = this.routerOpts.moreComponents || null;
 
       const view = getViewByName(indexName);
       // @redux 使用 store 包裹 Navigator
@@ -778,7 +781,9 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
 
         try {
           value = JSON.parse(value);
-        } catch (e) {}
+        } catch (e) {
+          console.warn(e);
+        }
 
         // url 的优先级高于 data
         data[key] = value;

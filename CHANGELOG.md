@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.13
+
+- 添加 router 全局 `actived` 回调
+- 修正页面侧滑未回退仍然会触发 `actived` 和 `deactived` 的 bug
+
 ## 0.30.12
 
 - 修正新开页面时可能无法传参的问题
@@ -15,15 +20,15 @@
 
 ## 0.30.9
 
-新增 Navigator 动画样式 `FloatFromBottomNoGestures`
+- 新增 Navigator 动画样式 `FloatFromBottomNoGestures`
 
 ## 0.30.8
 
-修正 Navigator 动画样式 `None` 在 iPhone 6s Plus 等机型渲染白屏的 bug
+- 修正 Navigator 动画样式 `None` 在 iPhone 6s Plus 等机型渲染白屏的 bug
 
 ## 0.30.7
 
-新增 Navigator 动画样式 `None`
+- 新增 Navigator 动画样式 `None`
 
 ## 0.30.5
 
