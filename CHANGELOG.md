@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.14
+
+- 新增 Navigator 动画样式 `FloatFromBottomNoGestures`
+
+
 ## 0.30.13
 
 - 添加 router 全局 `actived` 回调

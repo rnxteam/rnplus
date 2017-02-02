@@ -9,6 +9,7 @@ import ReactNative, {
   View,
 } from 'react-native';
 
+import styles from './styles';
 import './sceneConfig';
 import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
@@ -194,6 +195,7 @@ class NavComp extends Component {
 
     this.renderScene = this.renderScene.bind(this);
     this.onDidFocus = this.onDidFocus.bind(this);
+    this.configureScene = this.configureScene.bind(this);
   }
 
   componentDidMount() {
@@ -308,6 +310,8 @@ class NavComp extends Component {
       configure = getSceneConfig(route.opts.sceneConfig);
     } else if (route.routerPlugin && route.routerPlugin.sceneConfig) {
       configure = getSceneConfig(route.routerPlugin.sceneConfig);
+    } else if (this.routerOpts && this.routerOpts.sceneConfig) {
+      configure = getSceneConfig(this.routerOpts.sceneConfig);
     }
 
     if (!configure) {
@@ -361,8 +365,11 @@ class NavComp extends Component {
       const view = getViewByName(indexName);
       // @redux 使用 store 包裹 Navigator
       const navigatorComponent = mixRedux.wrapperNavigator(
-        <View style={{ flex: 1 }}>
+        <View
+          style={[styles.root, this.routerOpts.rootStyle]}
+        >
           <Navigator
+            sceneStyle={[styles.scene, this.routerOpts.rootStyle]}
             initialRoute={{
               name: indexName,
               opts: indexOpts,
