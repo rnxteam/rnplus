@@ -85,9 +85,6 @@ class _rnplus_popup extends __PView {
     deactived() {
       callEvent('deactived', this);
     },
-    destroy() {
-      callEvent('destroy', this);
-    },
   };
 
   close() {

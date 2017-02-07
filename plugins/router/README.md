@@ -104,9 +104,6 @@ class base extends PView {
         deactived() {
             console.log('[base][deactived]');
         },
-        destroy() {
-            console.log('[base][destroy]');
-        }
     };
 });
 ```
@@ -197,32 +194,16 @@ class base extends PView {
 
 > 举例：从 A 页面打开 B 页面，此时 A 页面就失活了。
 
-##### `destroy()`
-
-页面销毁时。
-
-> 举例：B 页面是从 A 页面打开的，现在从 B 页面返回 A 页面，此时 B 页面就被销毁了。
-
-#### 和原生周期的关系
-
-Router 生命周期 | 原生生命周期
-:-: | :-:
-`ready` | `componentDidMount`
-`actived` | 无
-`deactived` | 无
-`destroy` | `componentWillUnmount`
-
-
 ### API 和生命周期的关系
 
 API | 触发的生命周期回调
 :-: | :-:
 `open` | 当前页面的 `deactived` 和下一页面的 `ready`、`actived`
-`goto` | 若新建历史：当前页面的 `deactived` 和下一页面的 `ready`、`actived`；若回到历史：当前页面的 `deactived`、`destroy` 和下一页面的 `actived`
-`back` | 当前页面的 `deactived`、`destroy` 和下一页面的 `actived`
-`backTo` | 当前页面的 `deactived`、`destroy` 和下一页面的 `actived`
-`home` | 当前页面的 `deactived`、`destroy` 和下一页面的 `actived`
-`close` | 若关闭当前页面：当前页面的 `deactived`、`destroy` 和下一页面的 `actived`
+`goto` | 若新建历史：当前页面的 `deactived` 和下一页面的 `ready`、`actived`；若回到历史：当前页面的 `deactived` 和下一页面的 `actived`
+`back` | 当前页面的 `deactived` 和下一页面的 `actived`
+`backTo` | 当前页面的 `deactived` 和下一页面的 `actived`
+`home` | 当前页面的 `deactived` 和下一页面的 `actived`
+`close` | 若关闭当前页面：当前页面的 `deactived` 和下一页面的 `actived`
 
 ### 挂载在 `RNPlus` 上的对象
 
@@ -332,9 +313,6 @@ RNPlus.popup.show({
         deactived() {
             tester.log('[popup][deactived]');
         },
-        destroy() {
-            tester.log('[popupz][destroy]');
-        }
     },
 });
 
