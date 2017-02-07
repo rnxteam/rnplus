@@ -21,7 +21,7 @@ const Router = {};
  * @type {Array}
  * @example
  * vcs = [{
- *     nav,     // 导航器
+ *   nav,     // 导航器
  * }]
  */
 const vcs = [];
@@ -30,12 +30,13 @@ const vcs = [];
  * @type {Object}
  * @example
  * views = {
- *     pageA: {
- *         Component,   // viewClass
- *         em,          // 事件函数处理对象
- *         routerOpts   // 路由插件配置参数
- *         reactView    // render 后的 view element，已废弃
- *     }
+ *   pageA: {
+ *     hasReady,    // 是否 ready 过
+ *     Component,   // viewClass
+*      em,          // 事件函数处理对象
+ *     routerOpts   // 路由插件配置参数
+ *     reactView    // render 后的 view element，已废弃
+ *   }
  * }
  */
 const views = {};
@@ -231,7 +232,9 @@ class NavComp extends Component {
     this.currentView = null;
   }
 
-  onDidFocus() {
+  onDidFocus(router) {
+    const currentRouter = router;
+
     if (hasResetResetRouteStack) {
       hasResetResetRouteStack = false;
       return;
@@ -249,12 +252,22 @@ class NavComp extends Component {
     const prevView = this.currentView;
     this.currentView = getCurrentView();
 
+    const prevRouter = this.currentRouter;
+    this.currentRouter = currentRouter;
+
     // 用户骚微滑动下（没有回退）也会触发，需要防御下
-    if (prevView !== this.currentView) {
+    if (prevRouter !== this.currentRouter) {
       // 触发前一页面的 deactived
       if (prevView) {
         prevView.em.trigger('deactived');
       }
+
+      // 触发当前页面的 ready 如果是第一次来
+      if (!router.hasReady) {
+        this.currentRouter.hasReady = true;
+        this.currentView.em.trigger('ready', gActivedParam || {});
+      }
+
       // 触发当前页面的 actived
       this.currentView.em.trigger('actived', gActivedParam || {});
 
@@ -433,18 +446,8 @@ RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
 
   // 获取 view element
   // this.on('beforeComponentWillMount', (reactView) => {
-  //     view.reactView = reactView;
+  //   view.reactView = reactView;
   // });
-
-  // 触发 ready
-  this.on('afterComponentWillMount', () => {
-    this.trigger('ready');
-  });
-
-  // 触发 destroy
-  this.on('afterComponentWillUnmount', () => {
-    this.trigger('destroy');
-  });
 
   // 适配 React.RNPlus-Redux
   const routeInfo = getRouteInfoByName(name);

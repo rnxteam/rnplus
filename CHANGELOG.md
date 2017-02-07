@@ -1,9 +1,12 @@
 # CHANGELOG
 
+## 0.30.15
+
+- 搞个大新闻
+
 ## 0.30.14
 
-- 新增 Navigator 动画样式 `FloatFromBottomNoGestures`
-
+- 新增 Navigator 接近 iOS 系统的动画样式 `NativeIOS` 和无手势版 `NativeIOSNoGestures`
 
 ## 0.30.13
 
