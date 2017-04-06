@@ -23,11 +23,11 @@ const Bridge = {
   },
     // 关闭指定 RN VC
   backToReactVC(opts) {
-    callNativeAPI('QRCTVCManager', 'backToReactVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.index, opts.adrToken || '', {}]);
+    callNativeAPI('RNXViewControllerManager', 'backToReactVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.index, opts.adrToken || '', {}]);
   },
     // 关闭当前 RN VC
   closeCurrentVC() {
-    callNativeAPI('QRCTVCManager', 'closeCurrentVC', [{}]);
+    callNativeAPI('RNXViewControllerManager', 'closeCurrentVC', [{}]);
   },
     // 执行 Native 函数
   sendNativeEvents(opts) {
@@ -35,15 +35,15 @@ const Bridge = {
   },
     // 打开新的 VC
   openNewVC(opts) {
-    callNativeAPI('QRCTVCManager', 'openNewVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.moduleName || RNPlus.defaults.appName, opts.data || {}, opts.adrToken || '', {}]);
+    callNativeAPI('RNXViewControllerManager', 'openNewVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.moduleName || RNPlus.defaults.appName, opts.data || {}]);
   },
     // 关闭安卓透明 Activity
   closeActivityAndroid(adrToken) {
-    callNativeAPI('QRCTVCManager', 'closeActivity', [adrToken]);
+    callNativeAPI('RNXViewControllerManager', 'closeActivity', [adrToken]);
   },
     // 右滑手势开关
   setSwipeBackEnabled(isEnabled, vcIndex, cb = () => {}) {
-    callNativeAPI('QRCTVCManager', 'setSwipeBackEnabled', [isEnabled, vcIndex, cb]);
+    callNativeAPI('RNXViewControllerManager', 'setSwipeBackEnabled', [isEnabled, vcIndex, cb]);
   },
 };
 

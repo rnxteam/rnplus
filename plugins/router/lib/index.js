@@ -408,7 +408,9 @@ class NavComp extends Component {
 
 NavComp.propTypes = {
   initView: PropTypes.string,
+  /* eslint-disable */
   param: PropTypes.object,
+  /* eslint-enable */
 };
 NavComp.defaultProps = {
   initView: null,
@@ -803,7 +805,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
     return data;
   }
 
-  function openVC(data) {
+  function openVC(data = {}) {
     const openNewVCData = data.initProps || {};
 
     if (data.initView) {
@@ -849,7 +851,10 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
           // MAIN: 调用原生 API，路由回退
           nav.popToRoute(route);
           // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
+
+          /* eslint-disable */
           nav._cleanScenesPastIndex(routeIndex);
+          /* eslint-enable */
 
           // 通知 Native
           Bridge.backToReactVC({
@@ -873,6 +878,9 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
     if (parsedRes.type === 'react/biz') {
       const onReceiveScheme = RNPlus.defaults.onReceiveScheme;
       if (typeof onReceiveScheme === 'function') {
+        if (vcs.length === 0) {
+          openVC();
+        }
         onReceiveScheme(parsedRes);
       }
     }
