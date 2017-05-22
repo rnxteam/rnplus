@@ -1,4 +1,5 @@
 import ReactNative from 'react-native';
+import VCManager from 'react-native/Libraries/RNXComponents/index.js';
 
 const NativeModules = ReactNative.NativeModules;
 
@@ -22,8 +23,12 @@ const Bridge = {
     callNativeAPI('QRCTJumpHandleManager', 'sendScheme', [opts.url, opts.data, opts.adrToken || '', cb]);
   },
     // 关闭指定 RN VC
-  backToReactVC(opts) {
-    callNativeAPI('RNXViewControllerManager', 'backToReactVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.index, opts.adrToken || '', {}]);
+  backToReactVC({
+    projectId,
+    index,
+    callback = () => {},
+  }) {
+    VCManager.backToReactVC(projectId || RNPlus.defaults.projectId || '', index, callback);
   },
     // 关闭当前 RN VC
   closeCurrentVC() {
