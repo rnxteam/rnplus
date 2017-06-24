@@ -527,7 +527,18 @@ Router.open = (name, opts = {}) => {
   let res = false;
 
   if (nextView) {
-    const { nav } = getCurrentVC();
+    const vc = getCurrentVC();
+
+    if (!vc) {
+      log('vcs', {
+        length: vcs.length,
+        isCurrentVCUndefined: true,
+      });
+      return res;
+    }
+
+    const { nav } = vc;
+
     const method = opts.replace ? 'replace' : 'push';
 
     gActivedParam = opts.param;
