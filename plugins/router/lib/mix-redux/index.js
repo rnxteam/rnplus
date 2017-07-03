@@ -31,11 +31,22 @@ export default {
   setChildContext(context, routerParam) {
     // 给 view 插入一个 context
     context.constructor.childContextTypes = {
+      ...context.constructor.childContextTypes,
       param: PropTypes.object,
     };
-    context.getChildContext = () => ({
-      param: routerParam,
-    });
+
+    let _originalGetChildContext = context.getChildContext;
+    context.getChildContext = () => {
+      if(_originalGetChildContext)
+        return {
+          ..._originalGetChildContext.apply(context),
+          param: routerParam,
+        }
+      else 
+        return {
+          param: routerParam,
+        }
+    }
   },
   wrapperView(route, Component, getCurrentHashKey) {
         // 缓存渲染过的页面
