@@ -8,9 +8,9 @@ import ReactNative, {
   AppRegistry,
   View,
 } from 'react-native';
-import {
-  LogMonitor,
-} from 'react-native/Libraries/RNXComponents/index.js';
+// import {
+//   LogMonitor,
+// } from 'react-native/Libraries/RNXComponents/index.js';
 
 import styles from './styles';
 import './sceneConfig';
@@ -19,15 +19,16 @@ import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 
 // 埋点方法
-function log(key, data = null) {
-  if (key) {
-    LogMonitor.sendLog({
-      risk_level: 0,
-      entry_key: `app.rnplus.${key}`,
-      entry_detail: data,
-    });
-  }
-}
+// function log(key, data = null) {
+  // if (key) {
+  //   LogMonitor.sendLog({
+  //     risk_level: 0,
+  //     entry_key: `app.rnplus.${key}`,
+  //     entry_detail: data,
+  //   });
+  // }
+// }
+function log() {}
 
 const Router = {};
 /**
