@@ -26,11 +26,6 @@ function log(key, data = null) {
       entry_key: `app.rnplus.${key}`,
       entry_detail: data,
     });
-    console.log({
-      risk_level: 0,
-      entry_key: `app.rnplus.${key}`,
-      entry_detail: data,
-    });
   }
 }
 
