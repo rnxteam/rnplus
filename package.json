@@ -8,7 +8,7 @@
     "react-native"
   ],
   "dependencies": {
-    "babel-plugin-rnplus": "*"
+    "babel-plugin-rnplus": "0.0.3"
   },
   "devDependencies": {
     "eslint-config-pintec": "*"
