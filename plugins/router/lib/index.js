@@ -8,12 +8,27 @@ import ReactNative, {
   AppRegistry,
   View,
 } from 'react-native';
+// import {
+//   LogMonitor,
+// } from 'react-native/Libraries/RNXComponents/index.js';
 
 import styles from './styles';
 import './sceneConfig';
 import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
+
+// 埋点方法
+// function log(key, data = null) {
+  // if (key) {
+  //   LogMonitor.sendLog({
+  //     risk_level: 0,
+  //     entry_key: `app.rnplus.${key}`,
+  //     entry_detail: data,
+  //   });
+  // }
+// }
+function log() {}
 
 const Router = {};
 /**
@@ -221,6 +236,10 @@ class NavComp extends Component {
     const vcIndex = vcs.indexOf(this.vc);
 
     if (vcIndex > -1) {
+      log('vcs', {
+        length: vcs.length,
+        spliceIndex: vcIndex,
+      });
       vcs.splice(vcIndex, 1);
     }
 
@@ -353,6 +372,10 @@ class NavComp extends Component {
         nav: navigator,
       };
       this.vc = vc;
+      log('vcs', {
+        length: vcs.length,
+        push: null,
+      });
       vcs.push(vc);
     }
 
@@ -500,7 +523,18 @@ Router.open = (name, opts = {}) => {
   let res = false;
 
   if (nextView) {
-    const { nav } = getCurrentVC();
+    const vc = getCurrentVC();
+
+    if (!vc) {
+      log('vcs', {
+        length: vcs.length,
+        isCurrentVCUndefined: true,
+      });
+      return res;
+    }
+
+    const { nav } = vc;
+
     const method = opts.replace ? 'replace' : 'push';
 
     gActivedParam = opts.param;
@@ -573,11 +607,14 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       if (vcIndex < vcs.length - 1) {
         // 暂存数据
         // 通知 Native
+        log('backToReactVC', {
+          index: vcIndex,
+          api: 'BackTo',
+          vcsLen: vcs.length,
+        });
         Bridge.backToReactVC({
           // VC 标识
           index: vcIndex,
-          // 可选，安卓透明层标识（只有安卓才有）
-          adrToken: '',
         });
       }
 
@@ -619,11 +656,14 @@ Router.home = (opts = {}) => {
     // 暂存数据
     gActivedParam = opts.param;
     // 通知 Native
+    log('backToReactVC', {
+      index: 0,
+      api: 'home',
+      vcsLen: vcs.length,
+    });
     Bridge.backToReactVC({
       // VC 标识
       index: 0,
-      // 可选，安卓透明层标识（只有安卓才有）
-      adrToken: '',
     });
   }
 
@@ -835,11 +875,14 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
         gActivedParam = (data.initProps && data.initProps.param) || {};
 
         if (currentView === nextView) {
+          log('backToReactVC', {
+            index: vcs.length - 1,
+            api: 'myBackTo.sameView',
+            vcsLen: vcs.length,
+          });
           Bridge.backToReactVC({
             // VC 标识
             index: vcs.length - 1,
-            // 可选，安卓透明层标识（只有安卓才有）
-            adrToken: '',
           });
         } else {
           const { route, routeIndex, vcIndex } = nextRouteInfo;
@@ -857,11 +900,14 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
           /* eslint-enable */
 
           // 通知 Native
+          log('backToReactVC', {
+            index: vcIndex,
+            api: 'myBackTo.differentView',
+            vcsLen: vcs.length,
+          });
           Bridge.backToReactVC({
             // VC 标识
             index: vcIndex,
-            // 可选，安卓透明层标识（只有安卓才有）
-            adrToken: '',
           });
         }
 
