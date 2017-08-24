@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.30.18
+
+- 支持子组件 `bindEvents`，并能获取参数
+- 修复多同一页面回退时 actived 错乱的问题
+- 修复代码混淆压缩后，页面名取不准的问题，但是会导致 `RNPlus.defaults.router.actived` 参数发生变化，需要高度注意
+
 ## 0.30.17
 
 - 引入 rnx 特有模块 `VCManager`，不再支持官版 rn（如需适配官版 rn 请注掉该引用）
