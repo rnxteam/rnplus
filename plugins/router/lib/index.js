@@ -46,15 +46,19 @@ const vcs = [];
  * @example
  * views = {
  *   pageA: {
- *     hasReady,    // 是否 ready 过
  *     Component,   // viewClass
-*      em,          // 事件函数处理对象
  *     routerOpts   // 路由插件配置参数
- *     reactView    // render 后的 view element，已废弃
  *   }
  * }
  */
 const views = {};
+
+// 存放当前路由的容器
+// 和 this.currentRoute 的区别在于：
+// allCurrentRoute 是凌驾与 VC 之上的，总是记录当前呈现的路由
+// 而 this.currentRoute 记录的是当前 VC 的当前呈现的路由
+let allCurrentRoute = null;
+
 // 是否是 rnx 环境
 const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
 
@@ -195,7 +199,7 @@ class NavComp extends Component {
     super(props);
 
     this.indexName = this.getIndexName();
-    this.currentView = null;
+    this.currentRoute = null;
 
     /**
      * 处理应用状态变化
@@ -244,16 +248,15 @@ class NavComp extends Component {
     }
 
     // 触发前一页面的 deactived
-    if (this.currentView) {
-      this.currentView.em.trigger('deactived');
+    if (this.currentRoute) {
+      this.currentRoute.em.trigger('deactived');
     }
 
-    this.currentView = null;
+    this.currentRoute = null;
   }
 
-  onDidFocus(router) {
-    const currentRouter = router;
-
+  onDidFocus(route) {
+    const currentRoute = route;
     if (hasResetResetRouteStack) {
       hasResetResetRouteStack = false;
       return;
@@ -268,32 +271,31 @@ class NavComp extends Component {
       return;
     }
 
-    const prevView = this.currentView;
-    this.currentView = getCurrentView();
-
-    const prevRouter = this.currentRouter;
-    this.currentRouter = currentRouter;
+    const previousRoute = this.currentRoute;
 
     // 用户骚微滑动下（没有回退）也会触发，需要防御下
-    if (prevRouter !== this.currentRouter) {
+    if (previousRoute !== currentRoute) {
+      // 如果当前 route 不同于之前 route，说明页面真的切换了，不是骚微动了下
+      this.currentRoute = currentRoute;
+
       // 触发前一页面的 deactived
-      if (prevView) {
-        prevView.em.trigger('deactived');
+      if (previousRoute) {
+        previousRoute.em.trigger('deactived');
       }
 
       // 触发当前页面的 ready 如果是第一次来
-      if (!router.hasReady) {
-        this.currentRouter.hasReady = true;
-        this.currentView.em.trigger('ready', gActivedParam || {});
+      if (!currentRoute.hasReady) {
+        currentRoute.hasReady = true;
+        currentRoute.em.trigger('ready', gActivedParam || {});
       }
 
       // 触发当前页面的 actived
-      this.currentView.em.trigger('actived', gActivedParam || {});
+      currentRoute.em.trigger('actived', gActivedParam || {});
 
       // 全局激活处理
       const globalActived = this.routerOpts.actived;
       if (typeof globalActived === 'function') {
-        globalActived(this.currentView, gActivedParam);
+        globalActived(currentRoute, gActivedParam);
       }
 
       gActivedParam = null;
@@ -354,6 +356,10 @@ class NavComp extends Component {
   }
 
   renderScene(route, navigator) {
+    /**
+     * 【处理 VC】start
+     */
+
     // navigator 存储
     let isNewVC = false;
     // if (this.props.isQRCTDefCreate === true) {
@@ -378,6 +384,12 @@ class NavComp extends Component {
       });
       vcs.push(vc);
     }
+
+    /**
+     * 【处理 VC】end
+     */
+
+    allCurrentRoute = route;
 
     const view = getViewByName(route.name);
 
@@ -446,42 +458,12 @@ RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
     return;
   }
 
-  let name;
-  let view = {};
+  allCurrentRoute.em = this;
 
-  // 寻找 view
-  Object.keys(views).some((key) => {
-    const viewForKey = views[key];
-    if (context.constructor === viewForKey.Component ||
-            context.constructor === viewForKey.Component.WrappedComponent) {
-      name = key;
-      view = viewForKey;
-      return true;
-    }
-    return false;
-  });
-
-  if (!view) {
-    return;
-  }
-  // 获取事件函数处理对象
-  view.em = this;
-  // 获取页面内 Router 插件配置参数
-  view.routerOpts = pOpts;
-
-  // 获取 view element
-  // this.on('beforeComponentWillMount', (reactView) => {
-  //   view.reactView = reactView;
-  // });
-
-  // 适配 React.RNPlus-Redux
-  const routeInfo = getRouteInfoByName(name);
+  // 适配 RNPlus.Redux
   let routerParam = {};
-  if (routeInfo) {
-    const route = routeInfo.route;
-    if (route.opts && route.opts.param) {
-      routerParam = route.opts.param;
-    }
+  if (allCurrentRoute.opts && allCurrentRoute.opts.param) {
+    routerParam = allCurrentRoute.opts.param;
   }
 
   // @redux 将 routerParam 插入到 context 中, 令子组件调用
@@ -497,7 +479,7 @@ RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
     errorHandler.noAppName();
   }
 }, (comp, isView, plugins, className) => {
-    // 获取 Component
+  // 获取 Component
   if (isView) {
     if (!RNPlus.defaults.indexView && className.indexOf('_rnplus_') !== 0) {
       RNPlus.defaults.indexView = className;
@@ -544,6 +526,8 @@ Router.open = (name, opts = {}) => {
       opts,
       routerPlugin: nextView.Component.routerPlugin,
       hashKey: getHashKey(),
+      hasReady: false,
+      em: null,
     });
 
     setSwipeBackEnabled(false);
@@ -769,11 +753,10 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
     return;
   }
 
-  const route = routes[routesLen - 1];
-  const view = getViewByName(route.name);
-
-  view.em.trigger('actived', gActivedParam || {});
-  gActivedParam = null;
+  if (allCurrentRoute && allCurrentRoute.em) {
+    allCurrentRoute.em.trigger('actived', gActivedParam || {});
+    gActivedParam = null;
+  }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
   if (index >= vcs.length || index < 0 || !vcs[index]) {
@@ -784,8 +767,9 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
   const routesLen = routes.length;
 
   if (routesLen > 0) {
-    const view = getViewByName(routes[routesLen - 1].name);
-    view.em.trigger('deactived');
+    if (allCurrentRoute && allCurrentRoute.em) {
+      allCurrentRoute.em.trigger('deactived');
+    }
   }
 });
 
@@ -976,7 +960,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
     });
   }
 
-   // only in android
+  // only in android
   Bridge.closeActivityAndroid(res.adrToken);
 });
 
