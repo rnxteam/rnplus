@@ -289,14 +289,14 @@ class NavComp extends Component {
         currentRoute.em.trigger('ready', gActivedParam || {});
       }
 
-      // 触发当前页面的 actived
-      currentRoute.em.trigger('actived', gActivedParam || {});
-
       // 全局激活处理
       const globalActived = this.routerOpts.actived;
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
       }
+      
+      // 触发当前页面的 actived
+      currentRoute.em.trigger('actived', gActivedParam || {});
 
       gActivedParam = null;
     }

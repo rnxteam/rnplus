@@ -5,6 +5,7 @@
 - 支持子组件 `bindEvents`，并能获取参数
 - 修复多同一页面回退时 actived 错乱的问题
 - 修复代码混淆压缩后，页面名取不准的问题，但是会导致 `RNPlus.defaults.router.actived` 参数发生变化，需要高度注意
+- 全局的 `RNPlus.defaults.router.actived` 触发时机改为在页面 `actived` 触发之前
 
 ## 0.30.17
 
