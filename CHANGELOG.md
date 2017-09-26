@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.19
+
+- 新增全局 `deactived` 事件，参数为失活路由对象
+- 新增 `RNPlus.Router.currentRoute`，值为当前路由对象
+
 ## 0.30.18
 
 - 支持子组件 `bindEvents`，并能获取参数

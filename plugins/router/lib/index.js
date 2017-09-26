@@ -53,12 +53,6 @@ const vcs = [];
  */
 const views = {};
 
-// 存放当前路由的容器
-// 和 this.currentRoute 的区别在于：
-// allCurrentRoute 是凌驾与 VC 之上的，总是记录当前呈现的路由
-// 而 this.currentRoute 记录的是当前 VC 的当前呈现的路由
-let allCurrentRoute = null;
-
 // 是否是 rnx 环境
 const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
 
@@ -294,6 +288,11 @@ class NavComp extends Component {
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
       }
+      // 全局失活处理
+      const globalDeactived = this.routerOpts.deactived;
+      if (previousRoute && typeof globalDeactived === 'function') {
+        globalDeactived(previousRoute);
+      }
       
       // 触发当前页面的 actived
       currentRoute.em.trigger('actived', gActivedParam || {});
@@ -389,7 +388,7 @@ class NavComp extends Component {
      * 【处理 VC】end
      */
 
-    allCurrentRoute = route;
+    Router.currentRoute = route;
 
     const view = getViewByName(route.name);
 
@@ -458,12 +457,12 @@ RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
     return;
   }
 
-  allCurrentRoute.em = this;
+  Router.currentRoute.em = this;
 
   // 适配 RNPlus.Redux
   let routerParam = {};
-  if (allCurrentRoute.opts && allCurrentRoute.opts.param) {
-    routerParam = allCurrentRoute.opts.param;
+  if (Router.currentRoute.opts && Router.currentRoute.opts.param) {
+    routerParam = Router.currentRoute.opts.param;
   }
 
   // @redux 将 routerParam 插入到 context 中, 令子组件调用
@@ -753,8 +752,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
     return;
   }
 
-  if (allCurrentRoute && allCurrentRoute.em) {
-    allCurrentRoute.em.trigger('actived', gActivedParam || {});
+  if (Router.currentRoute && Router.currentRoute.em) {
+    Router.currentRoute.em.trigger('actived', gActivedParam || {});
     gActivedParam = null;
   }
 });
@@ -767,8 +766,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
   const routesLen = routes.length;
 
   if (routesLen > 0) {
-    if (allCurrentRoute && allCurrentRoute.em) {
-      allCurrentRoute.em.trigger('deactived');
+    if (Router.currentRoute && Router.currentRoute.em) {
+      Router.currentRoute.em.trigger('deactived');
     }
   }
 });
@@ -973,6 +972,11 @@ Router.Bridge = Bridge;
 Router.views = views;
 Router.vcs = vcs;
 Router.getCurrentViewName = getCurrentViewName;
+// 存放当前路由的容器
+// 和 this.currentRoute 的区别在于：
+// Router.currentRoute 是凌驾与 VC 之上的，总是记录当前呈现的路由
+// 而 this.currentRoute 记录的是当前 VC 的当前呈现的路由
+Router.currentRoute = null;
 
 RNPlus.Router = Router;
 
