@@ -11,6 +11,6 @@
     "babel-plugin-rnplus": "0.0.4"
   },
   "devDependencies": {
-    "eslint-config-pintec": "*"
+    "eslint-config-rnx": "*"
   }
 }

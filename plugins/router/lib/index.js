@@ -20,15 +20,15 @@ import errorHandler from './util/errorHandler.js';
 
 // 埋点方法
 // function log(key, data = null) {
-  // if (key) {
-  //   LogMonitor.sendLog({
-  //     risk_level: 0,
-  //     entry_key: `app.rnplus.${key}`,
-  //     entry_detail: data,
-  //   });
-  // }
+// if (key) {
+//   LogMonitor.sendLog({
+//     risk_level: 0,
+//     entry_key: `app.rnplus.${key}`,
+//     entry_detail: data,
+//   });
 // }
-function log() {}
+// }
+function log() { }
 
 const Router = {};
 /**
@@ -36,7 +36,8 @@ const Router = {};
  * @type {Array}
  * @example
  * vcs = [{
- *   nav,     // 导航器
+ *   tag: <Number>,        // 标签（native 提供）
+ *   nav: <Navigator>,     // 导航器
  * }]
  */
 const vcs = [];
@@ -64,7 +65,7 @@ let gActivedParam = {};
 // immediatelyResetRouteStack 会触发 onDidFocus
 let hasResetResetRouteStack = false;
 
-const NOOP = () => {};
+const NOOP = () => { };
 
 /**
  * 工具类方法
@@ -77,11 +78,18 @@ function getCurrentVC() {
   return vcs[vcs.length - 1];
 }
 /**
+* 获取当前 routes
+* @return {routes} 当前 routes
+*/
+function getCurrentRoutes() {
+  return getCurrentVC().nav.getCurrentRoutes();
+}
+/**
 * 获取当前 route
 * @return {Route} 当前 route
 */
 function getCurrentRoute() {
-  const routes = getCurrentVC().nav.getCurrentRoutes();
+  const routes = getCurrentRoutes();
   return routes[routes.length - 1];
 }
 /**
@@ -162,7 +170,10 @@ function setSwipeBackEnabled(isEnabled, vcIndex) {
   if (vcIndexCopy === undefined) {
     vcIndexCopy = vcs.length - 1;
   }
-  Bridge.setSwipeBackEnabled(isEnabled, vcIndexCopy);
+  const vc = vcs[vcIndexCopy];
+  if (vc) {
+    Bridge.setSwipeBackEnabled(isEnabled, vc.tag);
+  }
 }
 function checkAndOpenSwipeBack(vcIndex) {
   let vcIndexCopy = vcIndex;
@@ -191,7 +202,10 @@ function getHashKey() {
 class NavComp extends Component {
   constructor(props) {
     super(props);
-
+    console.log(props);
+    this.vc = {
+      tag: this.props.tag,
+    };
     this.indexName = this.getIndexName();
     this.currentRoute = null;
 
@@ -293,7 +307,7 @@ class NavComp extends Component {
       if (previousRoute && typeof globalDeactived === 'function') {
         globalDeactived(previousRoute);
       }
-      
+
       // 触发当前页面的 actived
       currentRoute.em.trigger('actived', gActivedParam || {});
 
@@ -355,47 +369,22 @@ class NavComp extends Component {
   }
 
   renderScene(route, navigator) {
-    /**
-     * 【处理 VC】start
-     */
-
-    // navigator 存储
-    let isNewVC = false;
-    // if (this.props.isQRCTDefCreate === true) {
-    if (vcs.length > 0) {
-      if (navigator !== getCurrentVC().nav) {
-        // 如果传入的 navigator 不是当前的，则判定为新开了 VC
-        isNewVC = true;
-      }
-    } else {
-      isNewVC = true;
-    }
-    // }
-
-    if (isNewVC) {
-      const vc = {
-        nav: navigator,
-      };
-      this.vc = vc;
-      log('vcs', {
-        length: vcs.length,
-        push: null,
-      });
-      vcs.push(vc);
+    // 处理 VC
+    if (!this.vc.nav) {
+      this.vc.nav = navigator;
+      vcs.push(this.vc);
     }
 
-    /**
-     * 【处理 VC】end
-     */
-
+    // 处理路由
     Router.currentRoute = route;
 
+    // 处理 redux
     const view = getViewByName(route.name);
-
     if (view) {
       // @redux 新增 store 页面生成 Provider
       return mixRedux.wrapperView(route, view.Component, getCurrentHashKey);
     }
+
     return null;
   }
 
@@ -428,7 +417,7 @@ class NavComp extends Component {
             onDidFocus={this.onDidFocus}
             navigationBar={navigationBar}
           />
-          { moreComponents }
+          {moreComponents}
         </View>
       );
 
@@ -555,11 +544,14 @@ Router.back = (opts = {}) => {
     checkAndOpenSwipeBack();
 
     res = true;
-  } else if (vcs.length > 1) {
+  } else {
     // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
-    gActivedParam = opts.param;
-    closeCurrentVC();
-    res = true;
+    // 当有多个 VC 或者在多项目环境下，放心关（和类似C端的项目相对）
+    if (vcs.length > 1 || RNPlus.defaults.inMultiProjects) {
+      gActivedParam = opts.param;
+      closeCurrentVC();
+      res = true;
+    }
   }
 
   return res;
@@ -737,13 +729,20 @@ Router.resetTo = (name, opts = {}) => {
 /**
  * Native Bridge
  */
-ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
-  // 如果是返回操作，此时 Navigator 的 componentWillUnmount 还未执行，所以 vcs 还未变少
-  if (index >= vcs.length || index < 0 || !vcs[index]) {
+ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
+  let currentVC;
+  vcs.some(vc => {
+    if (vc.tag === tag) {
+      currentVC = vc;
+      return true;
+    }
+  });
+
+  if (!currentVC) {
     return;
   }
 
-  const routes = vcs[index].nav.getCurrentRoutes();
+  const routes = currentVC.nav.getCurrentRoutes();
   const routesLen = routes.length;
 
   // 如果该 vc 没有页面了
@@ -758,9 +757,13 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
-  if (index >= vcs.length || index < 0 || !vcs[index]) {
-    return;
-  }
+  let currentVC;
+  vcs.some(vc => {
+    if (vc.tag === tag) {
+      currentVC = vc;
+      return true;
+    }
+  });
 
   const routes = vcs[index].nav.getCurrentRoutes();
   const routesLen = routes.length;
@@ -972,11 +975,14 @@ Router.Bridge = Bridge;
 Router.views = views;
 Router.vcs = vcs;
 Router.getCurrentViewName = getCurrentViewName;
+Router.getCurrentRoutes = getCurrentRoutes;
 // 存放当前路由的容器
 // 和 this.currentRoute 的区别在于：
 // Router.currentRoute 是凌驾与 VC 之上的，总是记录当前呈现的路由
 // 而 this.currentRoute 记录的是当前 VC 的当前呈现的路由
 Router.currentRoute = null;
+
+Router.closeCurrentVC = closeCurrentVC;
 
 RNPlus.Router = Router;
 
