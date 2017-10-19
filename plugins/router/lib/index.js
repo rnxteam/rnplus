@@ -204,7 +204,7 @@ class NavComp extends Component {
     super(props);
     console.log(props);
     this.vc = {
-      tag: this.props.tag,
+      tag: this.props.vcTag,
     };
     this.indexName = this.getIndexName();
     this.currentRoute = null;
