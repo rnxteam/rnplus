@@ -756,7 +756,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
     gActivedParam = null;
   }
 });
-ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
+ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -765,7 +765,11 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
     }
   });
 
-  const routes = vcs[index].nav.getCurrentRoutes();
+  if (!currentVC) {
+    return;
+  }
+
+  const routes = currentVC.nav.getCurrentRoutes();
   const routesLen = routes.length;
 
   if (routesLen > 0) {
