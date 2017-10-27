@@ -23,8 +23,8 @@ const Bridge = {
     callNativeAPI('QRCTBroadCastManager', 'sendBroadcast', [opts.name, opts.data, opts.projectId || '']);
   },
   // 发送 scheme
-  sendScheme(opts, cb = () => { }) {
-    callNativeAPI('QRCTJumpHandleManager', 'sendScheme', [opts.url, opts.data, opts.adrToken || '', cb]);
+  sendScheme(scheme) {
+    return VCManager.sendScheme(scheme);
   },
   // 关闭指定 RN VC
   backToReactVC({
