@@ -186,6 +186,8 @@ function checkAndOpenSwipeBack(vcIndex) {
   const routes = vcs[vcIndexCopy].nav.getCurrentRoutes();
   if (routes.length === 1) {
     setSwipeBackEnabled(true);
+  } else {
+    setSwipeBackEnabled(false);
   }
 }
 
@@ -750,6 +752,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
     closeCurrentVC();
     return;
   }
+
+  checkAndOpenSwipeBack();
 
   if (Router.currentRoute && Router.currentRoute.em) {
     Router.currentRoute.em.trigger('actived', gActivedParam || {});
