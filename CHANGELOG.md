@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.20
+
+- 新增对多 VC 环境的支持
+- 新增 `RNPlus.defaults.onBackPressed` 配置项，配置安卓返回键的全局回调
+
 ## 0.30.19
 
 - 新增全局 `deactived` 事件，参数为失活路由对象
