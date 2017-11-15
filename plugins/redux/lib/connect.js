@@ -112,17 +112,16 @@ export default function connect(mapStateToProps, mapDispatchToProps, mergeProps,
         this.wrappedInstance = wrappedInstance;
 
         this.onBackPressed = () => {
-          if (typeof wrappedInstance.onBackPressed === 'function') {
-            // PView 配置 onBackPressed 优先执行
-            return wrappedInstance.onBackPressed();
-          } else {
-            // 后执行全局 onBackPressed
-            const { onBackPressed } = RNPlus.defaults;
-            if (typeof onBackPressed === 'function') {
-              // TODO 可以增加一些参数，例如：当前 PView 等
-              return onBackPressed();
-            }
+          // 执行全局 onBackPressed
+          const { onBackPressed } = RNPlus.defaults;
+          if (typeof onBackPressed === 'function' && onBackPressed()) {
+            return true;
           }
+          // PView 配置 onBackPressed 优先执行
+          if (typeof wrappedInstance.onBackPressed === 'function') {
+            return wrappedInstance.onBackPressed();
+          }
+          
           return false;
         }
       }
