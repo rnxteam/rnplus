@@ -2,8 +2,7 @@ import ReactNative, {
   Platform,
 } from 'react-native';
 // 引入 rnx 特有模块 `VCManager`，不再支持官版 rn（如需适配官版 rn 请注掉该引用）
-// import VCManager from 'react-native/Libraries/RNXComponents/libs/Scheme/VCManager.js';
-import VCManager from 'VCManager';
+const VCManager = require('react-native/Libraries/RNXComponents/libs/Scheme/VCManager.js');
 
 const NativeModules = ReactNative.NativeModules;
 const isIOS = Platform.OS === 'ios';
