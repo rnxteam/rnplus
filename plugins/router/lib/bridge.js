@@ -50,6 +50,14 @@ const Bridge = {
       VCManager.setSwipeBackEnabled(isEnabled, tag, cb);
     }
   },
+  // 同步页面
+  recordViewHistory(tag, views) {
+    VCManager.recordViewHistory(tag, views);
+  },
+  // 获取页面
+  queryViewHistory() {
+    return VCManager.queryViewHistory();
+  },
 };
 
 export default Bridge;

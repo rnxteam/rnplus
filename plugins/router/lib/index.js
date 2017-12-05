@@ -18,6 +18,7 @@ import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 import handleScheme from './handleScheme';
+import syncViewsToNative from './syncViewsToNative';
 
 // 埋点方法
 // function log(key, data = null) {
@@ -266,6 +267,8 @@ class NavComp extends Component {
   }
 
   onDidFocus(route) {
+    syncViewsToNative(this.vc);
+
     const currentRoute = route;
     if (hasResetResetRouteStack) {
       hasResetResetRouteStack = false;
