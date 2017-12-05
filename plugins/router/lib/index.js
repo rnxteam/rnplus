@@ -17,6 +17,7 @@ import './sceneConfig';
 import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
+import handleScheme from './handleScheme';
 
 // 埋点方法
 // function log(key, data = null) {
@@ -204,7 +205,6 @@ function getHashKey() {
 class NavComp extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.vc = {
       tag: this.props.vcTag,
     };
@@ -410,7 +410,7 @@ class NavComp extends Component {
             sceneStyle={[styles.scene, this.routerOpts.rootStyle]}
             initialRoute={{
               name: indexName,
-              opts: indexOpts,
+              opts: this.props.initViewOpts,
               routerPlugin: view.Component.routerPlugin,
               hashKey: getHashKey(),
             }}
@@ -434,12 +434,12 @@ class NavComp extends Component {
 NavComp.propTypes = {
   initView: PropTypes.string,
   /* eslint-disable */
-  param: PropTypes.object,
+  initViewOpts: PropTypes.object,
   /* eslint-enable */
 };
 NavComp.defaultProps = {
   initView: null,
-  param: {},
+  initViewOpts: {},
 };
 
 // 这边匿名没有用箭头函数是为了保证 this 正确
@@ -580,7 +580,6 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       // MAIN: 调用原生 API，路由回退
       nav.popToRoute(route);
 
-      // QReact
       if (vcIndex < vcs.length - 1) {
         // 暂存数据
         // 通知 Native
@@ -783,195 +782,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
   }
 });
 
-ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) => {
-  /**
-   * 解析 url
-   * @param  {String} url
-   * @return {Object} 解析结果
-   */
-  function parseUrl(url) {
-    const content = url.split('://')[1];
-
-    if (!content) {
-      return {
-        ret: false,
-        url,
-        msg: 'url format invalid',
-      };
-    }
-
-    const contentArr = content.split('?');
-    const type = contentArr[0];
-
-    return {
-      ret: true,
-      url,
-      type,
-      data: contentArr[1],
-    };
-  }
-
-  /**
-   * 从 url 上获取数据并 合并到 res.data 上
-   * (url 的优先级高于 data)
-   */
-  function combineData(urlData, resData = {}) {
-    const data = resData;
-    if (urlData) {
-      const pairs = urlData.split('&');
-
-      pairs.forEach((pair) => {
-        const pairArr = pair.split('=');
-        const key = pairArr[0];
-        let value = decodeURIComponent(pairArr[1]);
-
-        try {
-          value = JSON.parse(value);
-        } catch (e) {
-          console.warn(e);
-        }
-
-        // url 的优先级高于 data
-        data[key] = value;
-      });
-    }
-
-    return data;
-  }
-
-  function openVC(data = {}) {
-    const openNewVCData = data.initProps || {};
-
-    if (data.initView) {
-      openNewVCData.initView = data.initView;
-    }
-
-    Bridge.openNewVC({
-      data: openNewVCData,
-    });
-
-    return true;
-  }
-
-  function myBackTo(name, data) {
-    if (!name) {
-      return false;
-    }
-
-    const currentView = getCurrentView();
-    const nextRouteInfo = getRouteInfoByName(name);
-    const nextView = getViewByName(name);
-    let myBackToRes = false;
-
-    if (nextView) {
-      if (nextRouteInfo) {
-        // 暂存数据
-        gActivedParam = (data.initProps && data.initProps.param) || {};
-
-        if (currentView === nextView) {
-          log('backToReactVC', {
-            index: vcs.length - 1,
-            api: 'myBackTo.sameView',
-            vcsLen: vcs.length,
-          });
-          Bridge.backToReactVC({
-            // VC 标识
-            index: vcs.length - 1,
-          });
-        } else {
-          const { route, routeIndex, vcIndex } = nextRouteInfo;
-          const { nav } = vcs[vcIndex];
-
-          // 方法回退识别（与手势回退（右滑）区分）
-          route.isBackByFunction = true;
-
-          // MAIN: 调用原生 API，路由回退
-          nav.popToRoute(route);
-          // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
-
-          /* eslint-disable */
-          nav._cleanScenesPastIndex(routeIndex);
-          /* eslint-enable */
-
-          // 通知 Native
-          log('backToReactVC', {
-            index: vcIndex,
-            api: 'myBackTo.differentView',
-            vcsLen: vcs.length,
-          });
-          Bridge.backToReactVC({
-            // VC 标识
-            index: vcIndex,
-          });
-        }
-
-        myBackToRes = true;
-      }
-    }
-
-    return myBackToRes;
-  }
-
-  const parsedRes = parseUrl(res.url);
-
-  if (parsedRes.ret) {
-    if (parsedRes.type === 'react/biz') {
-      const onReceiveScheme = RNPlus.defaults.onReceiveScheme;
-      if (typeof onReceiveScheme === 'function') {
-        if (vcs.length === 0) {
-          openVC();
-        }
-        onReceiveScheme(parsedRes);
-      }
-    }
-
-    if (parsedRes.type !== 'react/rnplus') {
-      return;
-    }
-  } else {
-    return;
-  }
-
-  const data = combineData(parsedRes.data, res.data);
-
-  let ret = false;
-
-  // 如果没有设置 projectId，帮他设置下
-  if (!RNPlus.defaults.projectId) {
-    RNPlus.defaults.projectId = data.projectId;
-  }
-
-  if (data.forceOpen === true) {
-    ret = openVC(data);
-  } else {
-    ret = myBackTo(data.initView, data);
-
-    if (!ret) {
-      // 返回失败
-      ret = openVC(data);
-    }
-  }
-
-  if (ret) {
-    Bridge.sendNativeEvents({
-      id: res.callbackId,
-      data: {
-        ret,
-        msg: '成功',
-      },
-    });
-  } else {
-    Bridge.sendNativeEvents({
-      id: res.callbackId,
-      data: {
-        ret,
-        msg: '失败',
-      },
-    });
-  }
-
-  // only in android
-  Bridge.closeActivityAndroid(res.adrToken);
+ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
+  handleScheme(json, vcs)
 });
 
 

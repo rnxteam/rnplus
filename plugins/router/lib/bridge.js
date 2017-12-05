@@ -7,6 +7,8 @@ import VCManager from 'react-native/Libraries/RNXComponents/libs/Scheme/VCManage
 const NativeModules = ReactNative.NativeModules;
 const isIOS = Platform.OS === 'ios';
 
+const NOOP = () => {};
+
 function callNativeAPI(namespace, APIName, args) {
   const NativeModule = NativeModules[namespace];
   if (NativeModule) {
@@ -26,29 +28,21 @@ const Bridge = {
   sendScheme(scheme) {
     return VCManager.sendScheme(scheme);
   },
-  // 关闭指定 RN VC
-  backToReactVC({
-    projectId,
-    index,
-    callback = () => { },
-  }) {
-    VCManager.backToReactVC(projectId || RNPlus.defaults.projectId || '', index, callback);
+  // 回到指定 RN VC
+  backToVC(tag) {
+    VCManager.backToReactVC(tag);
   },
   // 关闭当前 RN VC
   closeCurrentVC() {
     VCManager.closeCurrentVC();
   },
   // 执行 Native 函数
-  sendNativeEvents(opts) {
-    callNativeAPI('QRCTNativeCallbackManager', 'sendNativeEvents', [opts.id, opts.data || {}]);
+  schemeCallBack(callbackId, data) {
+    VCManager.schemeCallBack(callbackId, data);
   },
   // 打开新的 VC
-  openNewVC(opts) {
-    callNativeAPI('RNXViewControllerManager', 'openNewVC', [opts.projectId || RNPlus.defaults.projectId || '', opts.moduleName || RNPlus.defaults.appName, opts.data || {}]);
-  },
-  // 关闭安卓透明 Activity
-  closeActivityAndroid(adrToken) {
-    callNativeAPI('RNXViewControllerManager', 'closeActivity', [adrToken]);
+  openNewVC(initProps = {}, moduleName = 'naive', callback = NOOP) {
+    VCManager.openNewVC(moduleName, initProps, callback);
   },
   // 右滑手势开关
   setSwipeBackEnabled(isEnabled, tag, cb = () => { }) {
