@@ -15,6 +15,8 @@ RNPlus.defaults.router = {
   rootStyle: {
     backgroundColor: '#333',
   },
+  // 根节点 componentWillMount
+  rootComponentWillMount() {},
   // 根节点 componentDidMount
   rootComponentDidMount() {},
   // 根节点 componentWillUnmount

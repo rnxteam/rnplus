@@ -229,6 +229,13 @@ class NavComp extends Component {
     this.configureScene = this.configureScene.bind(this);
   }
 
+  componentWillMount() {
+    // 全局根节点 componentWillMount
+    const rootComponentWillMount = this.routerOpts.rootComponentWillMount;
+    if (typeof rootComponentWillMount === 'function') {
+      rootComponentWillMount();
+    }
+  }
   componentDidMount() {
     // 全局根节点 componentDidMount
     const rootComponentDidMount = this.routerOpts.rootComponentDidMount;
