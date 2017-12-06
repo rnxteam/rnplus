@@ -226,6 +226,7 @@ class NavComp extends Component {
 
     this.renderScene = this.renderScene.bind(this);
     this.onDidFocus = this.onDidFocus.bind(this);
+    this._onDidFocus = this._onDidFocus.bind(this);
     this.configureScene = this.configureScene.bind(this);
   }
 
@@ -286,6 +287,13 @@ class NavComp extends Component {
   }
 
   onDidFocus(route) {
+    // 因为首页的 onDidFocus 和 componentDidMount 同时
+    // 而后续页面的 onDidFocus 在动画完成之后
+    // 所以为保证一致性，手动延迟
+    setTimeout(this._onDidFocus, 0, route);
+  }
+
+  _onDidFocus(route) {
     syncViewsToNative(this.vc);
 
     const currentRoute = route;
