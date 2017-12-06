@@ -8,7 +8,14 @@ import mw from './middlewares';
  * @param options {Array} 官方提供的 createStore 参数, 包含 reducer/initialState/enhancer
  * @param middleware {Array} 中间件数组, 我们内置的中间件会放在所有中间件之后
  */
-function getStore(options, middleware = []) {
+function getStore(options, middleware) {
+  if (typeof middleware === 'function') {
+    middleware = middleware();
+  }
+  if (!Array.isArray(middleware)) {
+    middleware = [];
+  }
+
   const finalCreate = applyMiddleware(...middleware, ...mw)(createStore);
   return finalCreate(...options);
 }
