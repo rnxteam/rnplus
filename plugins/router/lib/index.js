@@ -230,6 +230,12 @@ class NavComp extends Component {
   }
 
   componentDidMount() {
+    // 全局根节点 componentDidMount
+    const rootComponentDidMount = this.routerOpts.rootComponentDidMount;
+    if (typeof rootComponentDidMount === 'function') {
+      rootComponentDidMount();
+    }
+
     // 处理应用状态变化
     AppState.addEventListener('change', this.onAppStateChange);
 
@@ -245,6 +251,12 @@ class NavComp extends Component {
     }
   }
   componentWillUnmount() {
+    // 全局根节点 componentWillUnmount
+    const rootComponentWillUnmount = this.routerOpts.rootComponentWillUnmount;
+    if (typeof rootComponentWillUnmount === 'function') {
+      rootComponentWillUnmount();
+    }
+
     // 处理应用状态变化
     AppState.removeEventListener('change', this.onAppStateChange);
 
@@ -396,9 +408,12 @@ class NavComp extends Component {
   render() {
     const indexName = this.indexName;
     if (indexName) {
-      const indexOpts = {
-        param: this.props.param,
-      };
+      let opts;
+      if (typeof this.props.initViewOpts === 'object') {
+        opts = {
+          ...this.props.initViewOpts,
+        };
+      }
 
       const navigationBar = this.routerOpts.navigationBar || null;
       const moreComponents = this.routerOpts.moreComponents || null;
@@ -413,7 +428,7 @@ class NavComp extends Component {
             sceneStyle={[styles.scene, this.routerOpts.rootStyle]}
             initialRoute={{
               name: indexName,
-              opts: this.props.initViewOpts,
+              opts,
               routerPlugin: view.Component.routerPlugin,
               hashKey: getHashKey(),
             }}
