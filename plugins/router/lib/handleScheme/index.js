@@ -51,7 +51,7 @@ function schemeBackTo(vcs) {
 
   if (vcs.length > 0) {
     // 先做简单的，不看具体页面，直接跳去坠近的 VC
-    Bridge.backToVC(vcs[length - 1].tag);
+    Bridge.backToVC(vcs[vcs.length - 1].tag);
     res = true;
   }
 
@@ -61,7 +61,7 @@ function handleScheme(json, vcs) {
   const urlData = parseUrl(json.url);
   const pathData = parsePath(urlData.path);
   const type = pathData.type;
-  const searchData = urlData.searchData;
+  const searchData = urlData.searchData || {};
   const viewName = searchData.view;
   const viewOpts = tryToGetViewOpts(searchData.viewOpts);
   let resData = {

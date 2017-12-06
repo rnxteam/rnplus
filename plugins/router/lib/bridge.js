@@ -30,7 +30,7 @@ const Bridge = {
   },
   // 回到指定 RN VC
   backToVC(tag) {
-    VCManager.backToReactVC(tag);
+    VCManager.backToVC(tag);
   },
   // 关闭当前 RN VC
   closeCurrentVC() {
