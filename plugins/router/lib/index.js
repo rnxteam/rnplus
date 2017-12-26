@@ -87,8 +87,11 @@ function getCurrentVC() {
 * @return {Route} 当前 route
 */
 function getCurrentRoute() {
-  const routes = getCurrentVC().nav.getCurrentRoutes();
-  return routes[routes.length - 1];
+  const currentVC = getCurrentVC();
+  if (currentVC) {
+    const routes = currentVC.nav.getCurrentRoutes();
+    return routes[routes.length - 1];
+  }
 }
 /**
  * 获取当前 viewName
@@ -96,7 +99,12 @@ function getCurrentRoute() {
  */
 function getCurrentViewName() {
   const route = getCurrentRoute();
-  return route.name;
+
+  if (route) {
+    return route.name;
+  }
+
+  return '';
 }
 /**
 * 根据页面名字获取页面
