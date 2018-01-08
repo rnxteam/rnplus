@@ -52,11 +52,16 @@ const Bridge = {
   },
   // 同步页面
   recordViewHistory(tag, views) {
+    console.log('blibee-app: recordViewHistory', tag, views);
     VCManager.recordViewHistory(tag, views);
   },
   // 获取页面
   queryViewHistory() {
     return VCManager.queryViewHistory();
+  },
+  // 关闭指定 tag VC
+  closeVC(tag) {
+    return VCManager.closeVC(tag);
   },
 };
 

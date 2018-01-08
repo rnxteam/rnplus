@@ -3,7 +3,7 @@ import Bridge from '../bridge.js';
 
 /**
  * 分析路径，找出 projectId 和 scheme 类型
- * @param {string} path 
+ * @param {string} path
  */
 function parsePath(path) {
   let projectId;
@@ -25,7 +25,7 @@ function parsePath(path) {
 
 /**
  * 初始数据格式化
- * @param {string} viewOptsStr 
+ * @param {string} viewOptsStr
  */
 function tryToGetViewOpts(viewOptsStr = '') {
   if (!viewOptsStr) {
@@ -58,6 +58,7 @@ function schemeBackTo(vcs) {
   return res;
 }
 function handleScheme(json, vcs) {
+  console.log('blibee-app:', json, vcs);
   const urlData = parseUrl(json.url);
   const pathData = parsePath(urlData.path);
   const type = pathData.type;
@@ -90,8 +91,28 @@ function handleScheme(json, vcs) {
     }
   } else if (type === 'open') {
     hasCallSendNativeEvents = true;
+    console.log('blibee-app: openNewVC', vcs);
     Bridge.openNewVC(initProps, searchData.moduleName, data => {
-      Bridge.schemeCallBack(json.callbackId, data);
+      console.log(initProps, searchData.moduleName, 'hello', vcs[0].tag);
+      Bridge.closeCurrentVC();
+      // Bridge.closeVC(vcs[0].tag);
+
+      Bridge.openNewVC({...initProps, initView: 'About'}, searchData.moduleName, data => {
+        console.log('app openNewVC:', data);
+
+        // setTimeout(() => {
+          Bridge.queryViewHistory().then((res) => {
+            console.log('blibee-app: resolve queryViewHistory', res, vcs);
+            console.log(JSON.stringify(res, null, 2));
+          }, (res) => {
+            console.log('blibee-app: reject queryViewHistory', res);
+          });
+        // }, 1000);
+        Bridge.schemeCallBack(json.callbackId, {
+          ret: data.ret,
+          msg: data.msg,
+        });
+      });
     });
   } else if (type === 'backTo') {
     const backToRes = schemeBackTo(vcs);
