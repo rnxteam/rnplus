@@ -565,6 +565,9 @@ Router.back = (opts = {}) => {
   return res;
 };
 
+// 为修复 'Calling popToRoute for a route that doesn\'t exist!' bug，锁
+const popToRouteMap = {};
+
 /**
  * [API] backTo
  * @param  {String} name 页面名字
@@ -579,31 +582,36 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
 
   if (nextView) {
     if (nextRouteInfo) {
-      const { route, vcIndex } = nextRouteInfo;
+      const { route, routeIndex, vcIndex } = nextRouteInfo;
       const { nav } = vcs[vcIndex];
 
-      gActivedParam = opts.param;
-      // MAIN: 调用原生 API，路由回退
-      nav.popToRoute(route);
+      if (!popToRouteMap[name]) {
+        popToRouteMap[name] = true;
 
-      // QReact
-      if (vcIndex < vcs.length - 1) {
-        // 暂存数据
-        // 通知 Native
-        log('backToReactVC', {
-          index: vcIndex,
-          api: 'BackTo',
-          vcsLen: vcs.length,
+        gActivedParam = opts.param;
+        // MAIN: 调用原生 API，路由回退
+        nav.popToRoute(route, () => {
+          delete popToRouteMap[name];
         });
-        Bridge.backToReactVC({
-          // VC 标识
-          index: vcIndex,
-        });
+
+        if (vcIndex < vcs.length - 1) {
+          // 暂存数据
+          // 通知 Native
+          log('backToReactVC', {
+            index: vcIndex,
+            api: 'BackTo',
+            vcsLen: vcs.length,
+          });
+          Bridge.backToReactVC({
+            // VC 标识
+            index: vcIndex,
+          });
+        }
+
+        checkAndOpenSwipeBack(vcIndex);
+
+        res = true;
       }
-
-      checkAndOpenSwipeBack(vcIndex);
-
-      res = true;
     } else if (_fromGoto !== true) {
       errorHandler.noRoute(name);
     }
@@ -876,8 +884,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (res) =
 
           // MAIN: 调用原生 API，路由回退
           nav.popToRoute(route);
-          // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
 
+          // VIP: 由于 popToRoute 导致 routes 变化是异步的，Native onShow 触发时最后一个 route 没变，所以这里手动清理下。
           /* eslint-disable */
           nav._cleanScenesPastIndex(routeIndex);
           /* eslint-enable */
