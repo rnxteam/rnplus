@@ -566,7 +566,7 @@ Router.back = (opts = {}) => {
 };
 
 // 为修复 'Calling popToRoute for a route that doesn\'t exist!' bug，锁
-const popToRouteMap = {};
+const popToRouteLock = false;
 
 /**
  * [API] backTo
@@ -585,13 +585,13 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       const { route, routeIndex, vcIndex } = nextRouteInfo;
       const { nav } = vcs[vcIndex];
 
-      if (!popToRouteMap[name]) {
-        popToRouteMap[name] = true;
+      if (!popToRouteLock) {
+        popToRouteLock = true;
 
         gActivedParam = opts.param;
         // MAIN: 调用原生 API，路由回退
         nav.popToRoute(route, () => {
-          delete popToRouteMap[name];
+          popToRouteLock = false;
         });
 
         if (vcIndex < vcs.length - 1) {
