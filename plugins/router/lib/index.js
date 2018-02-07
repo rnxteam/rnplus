@@ -280,7 +280,7 @@ class NavComp extends Component {
       // 触发当前页面的 ready 如果是第一次来
       if (!currentRoute.hasReady) {
         currentRoute.hasReady = true;
-        currentRoute.em.trigger('ready', gActivedParam || {});
+        currentRoute.em && currentRoute.em.trigger('ready', gActivedParam || {});
       }
 
       // 全局激活处理
@@ -295,7 +295,7 @@ class NavComp extends Component {
       }
       
       // 触发当前页面的 actived
-      currentRoute.em.trigger('actived', gActivedParam || {});
+      currentRoute.em && currentRoute.em.trigger('actived', gActivedParam || {});
 
       gActivedParam = null;
     }
