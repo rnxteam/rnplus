@@ -724,20 +724,22 @@ Router.resetTo = (name, opts = {}) => {
   let res = false;
 
   if (nextView) {
-    const { nav } = getCurrentVC();
+    const currentVC = getCurrentVC();
 
-    nav.resetTo({
-      name,
-      opts,
-      routerPlugin: nextView.Component.routerPlugin,
-      hashKey: getHashKey(),
-    });
+    if (currentVC && currentVC.nav) {
+      currentVC.nav.resetTo({
+        name,
+        opts,
+        routerPlugin: nextView.Component.routerPlugin,
+        hashKey: getHashKey(),
+      });
 
-    setSwipeBackEnabled(false);
+      setSwipeBackEnabled(false);
 
-    gActivedParam = opts.param;
+      gActivedParam = opts.param;
 
-    res = true;
+      res = true;
+    }
   }
 
   return res;
