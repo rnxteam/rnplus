@@ -91,17 +91,25 @@ function getCurrentRoutes() {
 * @return {Route} 当前 route
 */
 function getCurrentRoute() {
-  const routes = getCurrentRoutes();
-  return routes[routes.length - 1];
+  const currentVC = getCurrentVC();
+  if (currentVC) {
+    const routes = currentVC.nav.getCurrentRoutes();
+    return routes[routes.length - 1];
+  }
 }
+
 /**
  * 获取当前 viewName
  * @return {String} 当前页面名字
  */
 function getCurrentViewName() {
   const route = getCurrentRoute();
-  return route.name;
+  if (route) {
+    return route.name;
+  }
+  return '';
 }
+
 /**
 * 根据页面名字获取页面
 * @param  {String} name 页面名字

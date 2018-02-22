@@ -4,6 +4,7 @@
 
 - 新增对多 VC 环境的支持
 - 新增 `RNPlus.defaults.onBackPressed` 配置项，配置安卓返回键的全局回调
+- 修复调用 getCurrentVC 时报没有 VC 的错误
 
 ## 0.30.19
 
