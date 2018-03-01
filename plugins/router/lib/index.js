@@ -453,7 +453,9 @@ NavComp.defaultProps = {
 
 // 这边匿名没有用箭头函数是为了保证 this 正确
 RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
-  if (!isView) {
+  if (!isView || Router.currentRoute.em) {
+    // 如果不是 PView
+    // 或者当前路由已有 em（防止 PView 套 PView 导致外层 PView 的 em 被内层覆盖）
     return;
   }
 
