@@ -1,10 +1,15 @@
 # CHANGELOG
 
-## 0.30.19-patch
+## 0.30.19-patch.2
 
 - 防御 PView 套 PView 导致外层 PView 的 em 被内层覆盖
+
+## 0.30.19-patch.1
+
 - 修复 resetTo 方法中 undefined is not an object (evaluating 'a().nav') 的可能情况
-- 防御 .nav() 报错的情况
+
+## 0.30.19-patch.0
+
 - 防御 popToRoute 报错的情况
 
 ## 0.30.19
