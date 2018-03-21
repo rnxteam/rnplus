@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.19-patch.3
+
+- 移除对 popToRoute 报错的情况的防御
+
 ## 0.30.19-patch.2
 
 - 防御 PView 套 PView 导致外层 PView 的 em 被内层覆盖

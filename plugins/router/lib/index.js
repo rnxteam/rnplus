@@ -588,7 +588,7 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       const { nav } = vcs[vcIndex];
 
       if (!popToRouteLock) {
-        popToRouteLock = true;
+        // popToRouteLock = true;
 
         gActivedParam = opts.param;
         // MAIN: 调用原生 API，路由回退
