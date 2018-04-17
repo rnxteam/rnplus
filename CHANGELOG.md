@@ -5,6 +5,7 @@
 - 新增对多 VC 环境的支持
 - 新增 `RNPlus.defaults.onBackPressed` 配置项，配置安卓返回键的全局回调
 - 修复调用 getCurrentVC 时报没有 VC 的错误
+- 修复返回页面时，Router.currentRoute 未更新的 bug（0.30.20-beta.5）
 
 ## 0.30.19
 

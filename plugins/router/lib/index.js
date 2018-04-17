@@ -325,7 +325,9 @@ class NavComp extends Component {
     if (previousRoute !== currentRoute) {
       // 如果当前 route 不同于之前 route，说明页面真的切换了，不是骚微动了下
       this.currentRoute = currentRoute;
-
+      // 更新全局当前页面
+      Router.currentRoute = currentRoute;
+      
       // 触发前一页面的 deactived
       if (previousRoute) {
         previousRoute.em.trigger('deactived');
