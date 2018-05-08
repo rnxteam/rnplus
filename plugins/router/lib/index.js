@@ -84,7 +84,10 @@ function getCurrentVC() {
 * @return {routes} 当前 routes
 */
 function getCurrentRoutes() {
-  return getCurrentVC().nav.getCurrentRoutes();
+  const currentVC = getCurrentVC();
+  if (currentVC && currentVC.nav) {
+    return currentVC.nav.getCurrentRoutes();
+  } 
 }
 /**
 * 获取当前 route
@@ -92,7 +95,7 @@ function getCurrentRoutes() {
 */
 function getCurrentRoute() {
   const currentVC = getCurrentVC();
-  if (currentVC) {
+  if (currentVC && currentVC.nav) {
     const routes = currentVC.nav.getCurrentRoutes();
     return routes[routes.length - 1];
   }
@@ -578,24 +581,28 @@ Router.open = (name, opts = {}) => {
  * @return {Boolean} 执行结果（true 为成功 ，false 为失败）
  */
 Router.back = (opts = {}) => {
-  const { nav } = getCurrentVC();
-  const routes = nav.getCurrentRoutes();
   let res = false;
+  
+  const currentVC = getCurrentVC();
+  if (currentVC && currentVC.nav) {
+    const nav = currentVC.nav;
+    const routes = nav.getCurrentRoutes();
 
-  if (routes.length > 1) {
-    // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
-    gActivedParam = opts.param;
-    nav.pop();
-    checkAndOpenSwipeBack();
-
-    res = true;
-  } else {
-    // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
-    // 当有多个 VC 或者在多项目环境下，放心关（和类似C端的项目相对）
-    if (vcs.length > 1 || RNPlus.defaults.inMultiProjects) {
+    if (routes.length > 1) {
+      // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
       gActivedParam = opts.param;
-      closeCurrentVC();
+      nav.pop();
+      checkAndOpenSwipeBack();
+
       res = true;
+    } else {
+      // 如果当前 routes 只有一个路由，说明要关闭当前 VC 了
+      // 当有多个 VC 或者在多项目环境下，放心关（和类似C端的项目相对）
+      if (vcs.length > 1 || RNPlus.defaults.inMultiProjects) {
+        gActivedParam = opts.param;
+        closeCurrentVC();
+        res = true;
+      }
     }
   }
 
@@ -752,20 +759,22 @@ Router.resetTo = (name, opts = {}) => {
   let res = false;
 
   if (nextView) {
-    const { nav } = getCurrentVC();
+    const currentVC = getCurrentVC();
 
-    nav.resetTo({
-      name,
-      opts,
-      routerPlugin: nextView.Component.routerPlugin,
-      hashKey: getHashKey(),
-    });
-
-    setSwipeBackEnabled(false);
-
-    gActivedParam = opts.param;
-
-    res = true;
+    if (currentVC && currentVC.nav) {
+      currentVC.nav.resetTo({
+        name,
+        opts,
+        routerPlugin: nextView.Component.routerPlugin,
+        hashKey: getHashKey(),
+      });
+  
+      setSwipeBackEnabled(false);
+  
+      gActivedParam = opts.param;
+  
+      res = true;
+    }
   }
 
   return res;
