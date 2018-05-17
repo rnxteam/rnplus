@@ -7,6 +7,7 @@
 - 修复调用 getCurrentVC 时报没有 VC 的错误
 - 修复返回页面时，Router.currentRoute 未更新的 bug（0.30.20-beta.5）
 - 防御页面容器销毁时操作路由导致崩溃的问题（0.30.20-beta.6）
+- 修正 `backToReactVC` 为 `backToVC`（0.30.20-beta.7）
 
 ## 0.30.19
 
