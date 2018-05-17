@@ -633,12 +633,12 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       if (vcIndex < vcs.length - 1) {
         // 暂存数据
         // 通知 Native
-        log('backToReactVC', {
+        log('backToVC', {
           index: vcIndex,
           api: 'BackTo',
           vcsLen: vcs.length,
         });
-        Bridge.backToReactVC({
+        Bridge.backToVC({
           // VC 标识
           index: vcIndex,
         });
@@ -682,12 +682,12 @@ Router.home = (opts = {}) => {
     // 暂存数据
     gActivedParam = opts.param;
     // 通知 Native
-    log('backToReactVC', {
+    log('backToVC', {
       index: 0,
       api: 'home',
       vcsLen: vcs.length,
     });
-    Bridge.backToReactVC({
+    Bridge.backToVC({
       // VC 标识
       index: 0,
     });
