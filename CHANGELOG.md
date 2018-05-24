@@ -1,6 +1,5 @@
 # CHANGELOG
 
-<<<<<<< HEAD
 ## 0.30.20
 
 - 新增对多 VC 环境的支持
@@ -9,7 +8,7 @@
 - 修复返回页面时，Router.currentRoute 未更新的 bug（0.30.20-beta.5）
 - 防御页面容器销毁时操作路由导致崩溃的问题（0.30.20-beta.6）
 - 修正 `backToReactVC` 为 `backToVC`（0.30.20-beta.7）
-=======
+
 ## 0.30.19-patch.3
 
 - 移除对 popToRoute 报错的情况的防御
@@ -25,7 +24,6 @@
 ## 0.30.19-patch.0
 
 - 防御 popToRoute 报错的情况
->>>>>>> 0.30.19-patch
 
 ## 0.30.19
 
