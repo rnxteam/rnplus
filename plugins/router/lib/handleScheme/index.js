@@ -81,7 +81,10 @@ function handleScheme(json, vcs) {
   if (type === 'biz') {
     // 如果没有 VC，强制开一个
     if (vcs.length === 0) {
-      Bridge.openNewVC(initProps, searchData.moduleName);
+      hasCallSendNativeEvents = true;
+      Bridge.openNewVC(initProps, searchData.moduleName, data => {
+        Bridge.schemeCallBack(json.callbackId, data);
+      });
     }
 
     const onReceiveScheme = RNPlus.defaults.onReceiveScheme;
