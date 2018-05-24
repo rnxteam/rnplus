@@ -339,7 +339,7 @@ class NavComp extends Component {
       // 触发当前页面的 ready 如果是第一次来
       if (!currentRoute.hasReady) {
         currentRoute.hasReady = true;
-        currentRoute.em.trigger('ready', gActivedParam || {});
+        currentRoute.em && currentRoute.em.trigger('ready', gActivedParam || {});
       }
 
       // 全局激活处理
@@ -354,7 +354,7 @@ class NavComp extends Component {
       }
 
       // 触发当前页面的 actived
-      currentRoute.em.trigger('actived', gActivedParam || {});
+      currentRoute.em && currentRoute.em.trigger('actived', gActivedParam || {});
 
       gActivedParam = null;
     }
@@ -490,7 +490,9 @@ NavComp.defaultProps = {
 
 // 这边匿名没有用箭头函数是为了保证 this 正确
 RNPlus.addPlugin('router', function (context, pOpts = {}, isView) {
-  if (!isView) {
+  if (!isView || Router.currentRoute.em) {
+    // 如果不是 PView
+    // 或者当前路由已有 em（防止 PView 套 PView 导致外层 PView 的 em 被内层覆盖）
     return;
   }
 
@@ -609,6 +611,9 @@ Router.back = (opts = {}) => {
   return res;
 };
 
+// 为修复 'Calling popToRoute for a route that doesn\'t exist!' bug，锁
+const popToRouteLock = false;
+
 /**
  * [API] backTo
  * @param  {String} name 页面名字
@@ -623,30 +628,36 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
 
   if (nextView) {
     if (nextRouteInfo) {
-      const { route, vcIndex } = nextRouteInfo;
+      const { route, routeIndex, vcIndex } = nextRouteInfo;
       const { nav } = vcs[vcIndex];
 
-      gActivedParam = opts.param;
-      // MAIN: 调用原生 API，路由回退
-      nav.popToRoute(route);
+      if (!popToRouteLock) {
+        // popToRouteLock = true;
 
-      if (vcIndex < vcs.length - 1) {
-        // 暂存数据
-        // 通知 Native
-        log('backToVC', {
-          index: vcIndex,
-          api: 'BackTo',
-          vcsLen: vcs.length,
+        gActivedParam = opts.param;
+        // MAIN: 调用原生 API，路由回退
+        nav.popToRoute(route, () => {
+          popToRouteLock = false;
         });
-        Bridge.backToVC({
-          // VC 标识
-          index: vcIndex,
-        });
+
+        if (vcIndex < vcs.length - 1) {
+          // 暂存数据
+          // 通知 Native
+          log('backToVC', {
+            index: vcIndex,
+            api: 'BackTo',
+            vcsLen: vcs.length,
+          });
+          Bridge.backToVC({
+            // VC 标识
+            index: vcIndex,
+          });
+        }
+
+        checkAndOpenSwipeBack(vcIndex);
+
+        res = true;
       }
-
-      checkAndOpenSwipeBack(vcIndex);
-
-      res = true;
     } else if (_fromGoto !== true) {
       errorHandler.noRoute(name);
     }
@@ -772,7 +783,7 @@ Router.resetTo = (name, opts = {}) => {
       setSwipeBackEnabled(false);
   
       gActivedParam = opts.param;
-  
+
       res = true;
     }
   }
