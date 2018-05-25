@@ -2,7 +2,7 @@
  * Router - Popup
  * 弹层组件
  *
- * @author  yayu.wang@qunar.com
+ * @author  i@wangdagen.com
  * @since   2016/5/17
  */
 
