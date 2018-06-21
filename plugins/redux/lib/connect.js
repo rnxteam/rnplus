@@ -111,18 +111,8 @@ export default function connect(mapStateToProps, mapDispatchToProps, mergeProps,
       getWrappedComponent(wrappedInstance) {
         this.wrappedInstance = wrappedInstance;
 
-        this.onBackPressed = () => {
-          // 执行全局 onBackPressed
-          const { onBackPressed } = RNPlus.defaults;
-          if (typeof onBackPressed === 'function' && onBackPressed()) {
-            return true;
-          }
-          // PView 配置 onBackPressed 优先执行
-          if (typeof wrappedInstance.onBackPressed === 'function') {
-            return wrappedInstance.onBackPressed();
-          }
-          
-          return false;
+        if (wrappedInstance && typeof wrappedInstance.onBackPressed === 'function') {
+          this.onBackPressed = wrappedInstance.onBackPressed.bind(wrappedInstance);
         }
       }
 
