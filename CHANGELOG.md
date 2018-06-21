@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.20-beta.8
+
+- 去除 `RNPlus.defaults.onBackPressed` 配置项
+- `RNPlus.defaults.router` 增加 `onBackPressed` 配置项
+
 ## 0.30.20
 
 - 新增对多 VC 环境的支持
