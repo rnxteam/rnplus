@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.21
+
+- onshow 引发的 actived 不再传递上一次路由跳转参数，而是传递 `{ __onshow: true }` 对象
+
 ## 0.30.20
 
 - 新增对多 VC 环境的支持
