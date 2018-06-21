@@ -7,6 +7,26 @@ const { defineStore, usingRedux, invariant } = RNPlus.Redux;
 
 const uniqueStoreSymbol = 'This_view_has_it\'s_own_store.';
 const renderedElementSymbol = 'I_don\'t_want_be_rendered_again.';
+const onBackPressedSymbol = 'onBackPressed_Already_Override';
+
+// 增加全局 onBackPressed 事件
+const getWrappedComponent = (wrappedComponent) => {
+  if (wrappedComponent && !wrappedComponent[onBackPressedSymbol]) {
+    wrappedComponent[onBackPressedSymbol] = true;
+    const { onBackPressed } = wrappedComponent;
+    wrappedComponent.onBackPressed = () => {
+      const { router } = RNPlus.defaults;
+      // 执行全局 onBackPressed
+      if (typeof router.onBackPressed === 'function' && router.onBackPressed()) {
+        return true;
+      }
+      if (typeof onBackPressed === 'function') {
+        return onBackPressed();
+      }
+      return false;
+    };
+  }
+};
 
 export default {
   wrapperRouter(Router) {
@@ -42,25 +62,25 @@ export default {
           ..._originalGetChildContext.apply(context),
           param: routerParam,
         }
-      else 
+      else
         return {
           param: routerParam,
         }
     }
   },
   wrapperView(route, Component, getCurrentHashKey) {
-        // 缓存渲染过的页面
+    // 缓存渲染过的页面
     let renderedElement = route.opts[renderedElementSymbol];
     if (renderedElement) return renderedElement;
 
     const param = (route.opts && route.opts.param) || {};
-    renderedElement = <Component param={param} />;
+    renderedElement = <Component ref={getWrappedComponent} param={param} />;
 
-        // 如果渲染的页面是当前第一页，且拥有 uniqueStore 标志
-        // 渲染 Provider 包裹的 component
+    // 如果渲染的页面是当前第一页，且拥有 uniqueStore 标志
+    // 渲染 Provider 包裹的 component
     if (usingRedux() &&
-            route.opts[uniqueStoreSymbol] &&
-            route.hashKey === getCurrentHashKey()) {
+      route.opts[uniqueStoreSymbol] &&
+      route.hashKey === getCurrentHashKey()) {
       const state = this.__store.getState();
       renderedElement = <Provider store={defineStore(state)}>{ renderedElement }</Provider>;
     }

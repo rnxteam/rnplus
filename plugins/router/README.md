@@ -4,6 +4,8 @@
 
 ```js
 RNPlus.defaults.router = {
+  // 全局物理键返回事件
+  onBackPressed(){},
   // 动画 {string | sceneConfig}
   sceneConfig: PAGE_ANI,
   // 全局级组件 {array[component]}
