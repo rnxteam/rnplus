@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.19-patch.5
+
+- `RNPlus.defaults.router` 增加 `onBackPressed` 配置项
+
 ## 0.30.19-patch.4
 
 - onshow 引发的 actived 不再传递上一次路由跳转参数，而是传递 `{ __onshow: true }` 对象
