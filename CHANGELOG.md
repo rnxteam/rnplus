@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.19-patch.4
+
+- onshow 引发的 actived 不再传递上一次路由跳转参数，而是传递 `{ __onshow: true }` 对象
+
 ## 0.30.19-patch.3
 
 - 移除对 popToRoute 报错的情况的防御

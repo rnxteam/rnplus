@@ -765,8 +765,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (index) => {
   }
 
   if (Router.currentRoute && Router.currentRoute.em) {
-    Router.currentRoute.em.trigger('actived', gActivedParam || {});
-    gActivedParam = null;
+    Router.currentRoute.em.trigger('actived', { __onshow: true });
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (index) => {
