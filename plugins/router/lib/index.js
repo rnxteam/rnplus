@@ -197,10 +197,10 @@ function checkAndOpenSwipeBack(vcIndex) {
     return;
   }
   const routes = vcs[vcIndexCopy].nav.getCurrentRoutes();
-  if (routes.length === 1) {
-    setSwipeBackEnabled(true);
+  if (routes.length === 1 && vcIndexCopy > 0) {
+    setSwipeBackEnabled(true, vcIndexCopy);
   } else {
-    setSwipeBackEnabled(false);
+    setSwipeBackEnabled(false, vcIndexCopy);
   }
 }
 
@@ -780,7 +780,7 @@ Router.resetTo = (name, opts = {}) => {
         hashKey: getHashKey(),
       });
   
-      setSwipeBackEnabled(false);
+      checkAndOpenSwipeBack();
   
       gActivedParam = opts.param;
 
@@ -821,7 +821,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
     return;
   }
 
-  checkAndOpenSwipeBack();
+  checkAndOpenSwipeBack(vcs.indexOf(currentVC));
 
   if (Router.currentRoute && Router.currentRoute.em) {
     Router.currentRoute.em.trigger('actived', { __onshow: true });
