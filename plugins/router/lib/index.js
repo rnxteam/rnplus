@@ -198,7 +198,13 @@ function checkAndOpenSwipeBack(vcIndex) {
   }
   const routes = vcs[vcIndexCopy].nav.getCurrentRoutes();
   if (routes.length === 1 && vcIndexCopy > 0) {
-    setSwipeBackEnabled(true, vcIndexCopy);
+    Bridge.queryViewHistory().then(vcs => {
+      if (vcs.length > 1) {
+        setSwipeBackEnabled(true, vcIndexCopy);
+      } else {
+        setSwipeBackEnabled(false, vcIndexCopy);
+      }
+    }).catch(() => {});
   } else {
     setSwipeBackEnabled(false, vcIndexCopy);
   }
