@@ -197,9 +197,24 @@ function checkAndOpenSwipeBack(vcIndex) {
     return;
   }
   const routes = vcs[vcIndexCopy].nav.getCurrentRoutes();
-  if (routes.length === 1 && vcIndexCopy > 0) {
-    Bridge.queryViewHistory().then(vcs => {
-      if (vcs.length > 1) {
+  if (routes.length === 1) {
+    // 如果当前 vc 只有一个页面
+    Bridge.queryViewHistory().then(views => {
+      let lastVcTag;
+      // 检测是否有多个 vc
+      const moreThanOne = views.some(view => {
+        const currentTag = view.tag;
+        if (lastVcTag === undefined) {
+          lastVcTag = currentTag;
+          return false;
+        } else if (lastVcTag === currentTag) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+      if (moreThanOne) {
+        // 如果有多个 vc
         setSwipeBackEnabled(true, vcIndexCopy);
       } else {
         setSwipeBackEnabled(false, vcIndexCopy);
