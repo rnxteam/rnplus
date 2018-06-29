@@ -834,6 +834,9 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   // 第一次 onShow 就不触发了，和 onDidFocus 重了
   if (!currentVC.hasOnShow) {
     currentVC.hasOnShow = true;
+    syncViewsToNative(currentVC).then(() => {
+      checkAndOpenSwipeBack(vcs.indexOf(currentVC));
+    });
     return;
   }
 
