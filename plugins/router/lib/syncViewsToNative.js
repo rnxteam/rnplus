@@ -10,7 +10,7 @@ function syncViewsToNative(vc) {
     }
   }
 
-  Bridge.recordViewHistory(vc.tag, views);
+  return Bridge.recordViewHistory(vc.tag, views);
 }
 
 export default syncViewsToNative;

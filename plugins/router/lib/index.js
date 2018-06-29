@@ -301,6 +301,8 @@ class NavComp extends Component {
     }
 
     this.currentRoute = null;
+
+    syncViewsToNative(this.vc);
   }
 
   onDidFocus(route) {
@@ -753,7 +755,9 @@ Router.close = (name) => {
         hasResetResetRouteStack = true;
         nav.immediatelyResetRouteStack(routes);
 
-        checkAndOpenSwipeBack(vcIndex);
+        syncViewsToNative(vcs[vcIndex]).then(() => {
+          checkAndOpenSwipeBack(vcIndex);
+        });
 
         res = true;
       }
