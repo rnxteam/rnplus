@@ -64,10 +64,11 @@ function handleScheme(json, vcs) {
   const searchData = urlData.searchData || {};
   const viewName = searchData.view;
   const viewOpts = tryToGetViewOpts(searchData.viewOpts);
+  // data 存在，代表成功；data 不存在，代表失败
   let resData = {
     ret: true,
     msg: 'success',
-    data: 'success',
+    data: {},
   };
   let hasCallSendNativeEvents = false;
 
