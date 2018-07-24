@@ -67,6 +67,7 @@ function handleScheme(json, vcs) {
   let resData = {
     ret: true,
     msg: 'success',
+    data: 'success',
   };
   let hasCallSendNativeEvents = false;
 
