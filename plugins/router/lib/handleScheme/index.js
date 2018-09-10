@@ -3,7 +3,7 @@ import Bridge from '../bridge.js';
 
 /**
  * 分析路径，找出 projectId 和 scheme 类型
- * @param {string} path 
+ * @param {string} path
  */
 function parsePath(path) {
   let projectId;
@@ -25,7 +25,7 @@ function parsePath(path) {
 
 /**
  * 初始数据格式化
- * @param {string} viewOptsStr 
+ * @param {string} viewOptsStr
  */
 function tryToGetViewOpts(viewOptsStr = '') {
   if (!viewOptsStr) {
@@ -57,7 +57,7 @@ function schemeBackTo(vcs) {
 
   return res;
 }
-function handleScheme(json, vcs) {
+function handleScheme(json, vcs, Router) {
   const urlData = parseUrl(json.url);
   const pathData = parsePath(urlData.path);
   const type = pathData.type;

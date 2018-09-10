@@ -87,7 +87,7 @@ function getCurrentRoutes() {
   const currentVC = getCurrentVC();
   if (currentVC && currentVC.nav) {
     return currentVC.nav.getCurrentRoutes();
-  } 
+  }
 }
 /**
 * 获取当前 route
@@ -353,7 +353,7 @@ class NavComp extends Component {
       this.currentRoute = currentRoute;
       // 更新全局当前页面
       Router.currentRoute = currentRoute;
-      
+
       // 触发前一页面的 deactived
       if (previousRoute) {
         previousRoute.em.trigger('deactived');
@@ -607,7 +607,7 @@ Router.open = (name, opts = {}) => {
  */
 Router.back = (opts = {}) => {
   let res = false;
-  
+
   const currentVC = getCurrentVC();
   if (currentVC && currentVC.nav) {
     const nav = currentVC.nav;
@@ -804,9 +804,9 @@ Router.resetTo = (name, opts = {}) => {
         routerPlugin: nextView.Component.routerPlugin,
         hashKey: getHashKey(),
       });
-  
+
       checkAndOpenSwipeBack();
-  
+
       gActivedParam = opts.param;
 
       res = true;
@@ -819,6 +819,7 @@ Router.resetTo = (name, opts = {}) => {
  * Native Bridge
  */
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
+  console.log('rnx_internal_onShow', tag)
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -856,6 +857,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
+  console.log('rnx_internal_onHide', tag)
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -879,7 +881,8 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
 });
 
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
-  handleScheme(json, vcs)
+  console.log('rnx_internal_receiveScheme', json)
+  handleScheme(json, vcs, Router)
 });
 
 
