@@ -822,7 +822,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   if (RNPlus.__store__) {
     RNPlus.store.replaceState(RNPlus.__store__);
   }
-  console.log('rnx_internal_onShow', tag, NPlus.__store__)
+  console.log('rnx_internal_onShow', tag, RNPlus.__store__)
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
