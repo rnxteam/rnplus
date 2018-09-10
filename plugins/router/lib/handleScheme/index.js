@@ -105,11 +105,20 @@ function handleScheme(json, vcs, Router) {
         ret: false,
         msg: 'backTo_failed',
       };
+    } else {
+      if (!Router.backTo(viewName, viewOpts)) {
+        resData = {
+          ret: false,
+          msg: 'backTo_failed',
+        };
+      }
     }
   } else if (type === 'goto') {
-    const backToRes = schemeBackTo(vcs);
+    const backToRes = schemeBackTo(vcs, Router);
     if (!backToRes) {
       Bridge.openNewVC(initProps, searchData.moduleName);
+    } else {
+      Router.goto(viewName, viewOpts);
     }
   }
 
