@@ -19,7 +19,6 @@ import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 import handleScheme from './handleScheme';
 import syncViewsToNative from './syncViewsToNative';
-import RNPlus from "rnplus";
 
 // 埋点方法
 // function log(key, data = null) {
@@ -820,7 +819,7 @@ Router.resetTo = (name, opts = {}) => {
  * Native Bridge
  */
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
-  if (RNPlus.__store__) {
+  if (RNPlus.defaults.shareStore && RNPlus.__store__) {
     RNPlus.store.replaceState(RNPlus.__store__);
   }
   let currentVC;
@@ -860,7 +859,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
-  RNPlus.__store__ = RNPlus.store.getState();
+  RNPlus.defaults.shareStore && (RNPlus.__store__ = RNPlus.store.getState());
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -884,7 +883,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
 });
 
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
-  console.log('rnx_internal_receiveScheme', json)
+  // console.log('rnx_internal_receiveScheme', json)
   handleScheme(json, vcs, Router)
 });
 
