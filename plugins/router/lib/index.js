@@ -819,9 +819,9 @@ Router.resetTo = (name, opts = {}) => {
  * Native Bridge
  */
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
-  if (RNPlus.defaults.shareStore && RNPlus.__store__) {
-    RNPlus.store.replaceState(RNPlus.__store__);
-  }
+  // if (RNPlus.defaults.shareStore && RNPlus.__store__) {
+  //   RNPlus.store.replaceState(RNPlus.__store__);
+  // }
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -859,7 +859,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
-  RNPlus.defaults.shareStore && (RNPlus.__store__ = RNPlus.store.getState());
+  // RNPlus.defaults.shareStore && (RNPlus.__store__ = RNPlus.store.getState());
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
