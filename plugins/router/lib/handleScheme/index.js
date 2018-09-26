@@ -85,7 +85,10 @@ function handleScheme(json, vcs, Router) {
     if (vcs.length === 0) {
       hasCallSendNativeEvents = true;
       Bridge.openNewVC(initProps, searchData.moduleName, data => {
-        Bridge.schemeCallBack(json.callbackId, data);
+        Bridge.schemeCallBack(json.callbackId, {
+          data: {},
+          ...data
+        });
       });
     }
 
@@ -96,7 +99,10 @@ function handleScheme(json, vcs, Router) {
   } else if (type === 'open') {
     hasCallSendNativeEvents = true;
     Bridge.openNewVC(initProps, searchData.moduleName, data => {
-      Bridge.schemeCallBack(json.callbackId, data);
+      Bridge.schemeCallBack(json.callbackId, {
+        data: {},
+        ...data
+      });
     });
   } else if (type === 'backTo') {
     const backToRes = schemeBackTo(vcs);
