@@ -18,6 +18,7 @@ import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 import handleScheme from './handleScheme';
+import beforeReceiveScheme from './beforeReceiveScheme';
 import syncViewsToNative from './syncViewsToNative';
 
 // 埋点方法
@@ -920,5 +921,5 @@ RNPlus.goto = Router.goto;
 RNPlus.home = Router.home;
 RNPlus.close = Router.close;
 RNPlus.resetTo = Router.resetTo;
-
+RNPlus.defaults.beforeReceiveScheme = beforeReceiveScheme;
 export default Router;

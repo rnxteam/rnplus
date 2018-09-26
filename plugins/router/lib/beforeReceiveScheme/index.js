@@ -141,7 +141,6 @@ function tryToGetViewOpts(viewOptsStr = '') {
 }
 
 const beforeReceiveScheme = new BeforeReceiveScheme();
-RNPlus.defaults.beforeReceiveScheme = beforeReceiveScheme;
 export default beforeReceiveScheme;
 
 
