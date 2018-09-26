@@ -884,7 +884,13 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
 
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
   // console.log('rnx_internal_receiveScheme', json)
-  handleScheme(json, vcs, Router)
+  if (RNPlus.defaults.beforeReceiveScheme) {
+      RNPlus.defaults.beforeReceiveScheme.run(json).then(() => {
+          handleScheme(json, vcs, Router)
+      })
+  } else {
+      handleScheme(json, vcs, Router)
+  }
 });
 
 
