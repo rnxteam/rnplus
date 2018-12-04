@@ -36,16 +36,18 @@ RNPlus 提供了配置 redux 的快捷方式，不需要配置原生的 `createS
 ```js
 // redux 配置项
 RNPlus.defaults.redux = {
-    /**
-     * 配置 createStore 的三个参数 reducer/initialState/enhancer
-     */
-    reducer,
-    initialState,
-    enhancer,
-    /**
-     * 配置 middleware 中间件
-     */
-    middleware: [],
+  /**
+   * 配置 createStore 的三个参数 reducer/initialState/enhancer
+   */
+  reducer,
+  initialState,
+  enhancer,
+  /**
+   * 配置 middleware 中间件
+   */
+  middleware: [],
+  // 配置保持一个 store，默认 false，可以不配置
+  keepStore: true,
 };
 ```
 

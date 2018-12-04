@@ -90,8 +90,8 @@ Demo = RNPlus.register(Demo, 'Demo');
 
 ```js
 RNPlus.defaults = {
-    appName: '',
-    globalPlugins: ['webx', 'router', 'redux'],
+  appName: '',
+  globalPlugins: ['router', 'redux'],
 };
 ```
 
