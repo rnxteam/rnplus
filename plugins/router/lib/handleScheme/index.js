@@ -3,7 +3,7 @@ import Bridge from '../bridge.js';
 
 /**
  * 分析路径，找出 projectId 和 scheme 类型
- * @param {string} path 
+ * @param {string} path
  */
 function parsePath(path) {
   let projectId;
@@ -25,7 +25,7 @@ function parsePath(path) {
 
 /**
  * 初始数据格式化
- * @param {string} viewOptsStr 
+ * @param {string} viewOptsStr
  */
 function tryToGetViewOpts(viewOptsStr = '') {
   if (!viewOptsStr) {
@@ -57,7 +57,7 @@ function schemeBackTo(vcs) {
 
   return res;
 }
-function handleScheme(json, vcs) {
+function handleScheme(json, vcs, Router) {
   const urlData = parseUrl(json.url);
   const pathData = parsePath(urlData.path);
   const type = pathData.type;
@@ -85,7 +85,10 @@ function handleScheme(json, vcs) {
     if (vcs.length === 0) {
       hasCallSendNativeEvents = true;
       Bridge.openNewVC(initProps, searchData.moduleName, data => {
-        Bridge.schemeCallBack(json.callbackId, data);
+        Bridge.schemeCallBack(json.callbackId, {
+          data: {},
+          ...data
+        });
       });
     }
 
@@ -96,7 +99,10 @@ function handleScheme(json, vcs) {
   } else if (type === 'open') {
     hasCallSendNativeEvents = true;
     Bridge.openNewVC(initProps, searchData.moduleName, data => {
-      Bridge.schemeCallBack(json.callbackId, data);
+      Bridge.schemeCallBack(json.callbackId, {
+        data: {},
+        ...data
+      });
     });
   } else if (type === 'backTo') {
     const backToRes = schemeBackTo(vcs);
@@ -105,11 +111,20 @@ function handleScheme(json, vcs) {
         ret: false,
         msg: 'backTo_failed',
       };
+    } else {
+      if (!Router.backTo(viewName, viewOpts)) {
+        resData = {
+          ret: false,
+          msg: 'backTo_failed',
+        };
+      }
     }
   } else if (type === 'goto') {
-    const backToRes = schemeBackTo(vcs);
+    const backToRes = schemeBackTo(vcs, Router);
     if (!backToRes) {
       Bridge.openNewVC(initProps, searchData.moduleName);
+    } else {
+      Router.goto(viewName, viewOpts);
     }
   }
 

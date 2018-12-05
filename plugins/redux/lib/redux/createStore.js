@@ -198,6 +198,15 @@ export default function createStore(reducer, initialState, enhancer) {
     dispatch({ type: ActionTypes.INIT });
   }
 
+  function replaceState(nextState) {
+    if (!isPlainObject(nextState)) {
+      throw new Error('Expected the nextState to be a plainObject')
+    }
+
+    currentState = nextState;
+    dispatch({ type: ActionTypes.INIT });
+  }
+
     // When a store is created, an "INIT" action is dispatched so that every
     // reducer returns their initial state. This effectively populates
     // the initial state tree.
@@ -208,5 +217,6 @@ export default function createStore(reducer, initialState, enhancer) {
     subscribe,
     getState,
     replaceReducer,
+    replaceState
   };
 }

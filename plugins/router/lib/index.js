@@ -18,6 +18,7 @@ import mixRedux from './mix-redux';
 import Bridge from './bridge.js';
 import errorHandler from './util/errorHandler.js';
 import handleScheme from './handleScheme';
+import beforeReceiveScheme from './beforeReceiveScheme';
 import syncViewsToNative from './syncViewsToNative';
 
 // 埋点方法
@@ -87,7 +88,7 @@ function getCurrentRoutes() {
   const currentVC = getCurrentVC();
   if (currentVC && currentVC.nav) {
     return currentVC.nav.getCurrentRoutes();
-  } 
+  }
 }
 /**
 * 获取当前 route
@@ -353,7 +354,7 @@ class NavComp extends Component {
       this.currentRoute = currentRoute;
       // 更新全局当前页面
       Router.currentRoute = currentRoute;
-      
+
       // 触发前一页面的 deactived
       if (previousRoute) {
         previousRoute.em.trigger('deactived');
@@ -607,7 +608,7 @@ Router.open = (name, opts = {}) => {
  */
 Router.back = (opts = {}) => {
   let res = false;
-  
+
   const currentVC = getCurrentVC();
   if (currentVC && currentVC.nav) {
     const nav = currentVC.nav;
@@ -804,9 +805,9 @@ Router.resetTo = (name, opts = {}) => {
         routerPlugin: nextView.Component.routerPlugin,
         hashKey: getHashKey(),
       });
-  
+
       checkAndOpenSwipeBack();
-  
+
       gActivedParam = opts.param;
 
       res = true;
@@ -819,6 +820,9 @@ Router.resetTo = (name, opts = {}) => {
  * Native Bridge
  */
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
+  // if (RNPlus.defaults.shareStore && RNPlus.__store__) {
+  //   RNPlus.store.replaceState(RNPlus.__store__);
+  // }
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -856,6 +860,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
+  // RNPlus.defaults.shareStore && (RNPlus.__store__ = RNPlus.store.getState());
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -879,7 +884,14 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
 });
 
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
-  handleScheme(json, vcs)
+  // console.log('rnx_internal_receiveScheme', json)
+  if (RNPlus.defaults.beforeReceiveScheme) {
+      RNPlus.defaults.beforeReceiveScheme.run(json).then(() => {
+          handleScheme(json, vcs, Router)
+      })
+  } else {
+      handleScheme(json, vcs, Router)
+  }
 });
 
 
@@ -909,5 +921,5 @@ RNPlus.goto = Router.goto;
 RNPlus.home = Router.home;
 RNPlus.close = Router.close;
 RNPlus.resetTo = Router.resetTo;
-
+RNPlus.defaults.beforeReceiveScheme = beforeReceiveScheme;
 export default Router;

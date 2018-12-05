@@ -81,7 +81,7 @@ export default {
     if (usingRedux() &&
       route.opts[uniqueStoreSymbol] &&
       route.hashKey === getCurrentHashKey()) {
-      const state = this.__store.getState();
+      const state = RNPlus.defaults.shareStore ? RNPlus.store.getState() : this.__store.getState();
       renderedElement = <Provider store={defineStore(state)}>{ renderedElement }</Provider>;
     }
 
@@ -95,11 +95,12 @@ export default {
           this.__store = defineStore();
           RNPlus.store = this.__store;
         }
+      } else if (RNPlus.defaults.shareStore && RNPlus.store && RNPlus.store.getState()) {
+        this.__store = RNPlus.store;
       } else {
         this.__store = defineStore();
         RNPlus.store = this.__store;
       }
-      
       return <Provider store={this.__store}>{ navigatorComponent }</Provider>;
     } else {
       return navigatorComponent;
