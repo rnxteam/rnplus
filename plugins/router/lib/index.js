@@ -855,8 +855,9 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
 
   checkAndOpenSwipeBack(vcs.indexOf(currentVC));
 
-  if (Router.currentRoute && Router.currentRoute.em) {
-    Router.currentRoute.em.trigger('actived', { __onshow: true });
+  const lastRoute = routes[routes.length - 1];
+  if (lastRoute && lastRoute.em) {
+		lastRoute.em.trigger('actived', { __onshow: true });
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
