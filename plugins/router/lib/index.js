@@ -319,6 +319,8 @@ class NavComp extends Component {
     this.currentRoute = null;
 
     syncViewsToNative(this.vc);
+    RNPlus.ViewManager &&
+    RNPlus.ViewManager.trigger('unmount_application_component_atroottag');
   }
 
   onDidFocus(route) {
@@ -370,6 +372,8 @@ class NavComp extends Component {
       const globalActived = this.routerOpts.actived;
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
+        RNPlus.ViewManager &&
+        RNPlus.ViewManager.trigger('router_view_actived');
       }
       // 全局失活处理
       const globalDeactived = this.routerOpts.deactived;
