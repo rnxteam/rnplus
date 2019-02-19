@@ -858,7 +858,7 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
 
   const lastRoute = routes[routes.length - 1];
   if (lastRoute && lastRoute.em) {
-		lastRoute.em.trigger('actived', { __onshow: true });
+    lastRoute.em.trigger('actived', { __onshow: true });
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
