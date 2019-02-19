@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.30.27
+
+- 新增 `RNPlus.ViewManager`
+- 移除 `isRNX` 逻辑判断
+
 ## 0.30.26
 
 - 修复多 rnx 环境重复打开同一 JS 环境后回退 VC 时 active 页面为刚回退 VC 的页面的 bug
