@@ -58,7 +58,7 @@ const vcs = [];
 const views = {};
 
 // 是否是 rnx 环境
-const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
+// const isRnx = !!ReactNative.NativeModules.RnxRCTDeviceInfo;
 
 /**
  * 一次性消费
@@ -283,10 +283,10 @@ class NavComp extends Component {
     if (this.indexName) {
       const param = getCurrentRoute().opts.param;
 
-      if (isRnx) {
+      // if (isRnx) {
         // 暂存数据
         gActivedParam = param;
-      }
+      // }
     } else {
       errorHandler.noIndexView();
     }
@@ -824,9 +824,6 @@ Router.resetTo = (name, opts = {}) => {
  * Native Bridge
  */
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
-  // if (RNPlus.defaults.shareStore && RNPlus.__store__) {
-  //   RNPlus.store.replaceState(RNPlus.__store__);
-  // }
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -865,7 +862,6 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onShow', (tag) => {
   }
 });
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
-  // RNPlus.defaults.shareStore && (RNPlus.__store__ = RNPlus.store.getState());
   let currentVC;
   vcs.some(vc => {
     if (vc.tag === tag) {
@@ -889,7 +885,6 @@ ReactNative.DeviceEventEmitter.addListener('rnx_internal_onHide', (tag) => {
 });
 
 ReactNative.DeviceEventEmitter.addListener('rnx_internal_receiveScheme', (json) => {
-  // console.log('rnx_internal_receiveScheme', json)
   if (RNPlus.defaults.beforeReceiveScheme) {
       RNPlus.defaults.beforeReceiveScheme.run(json).then(() => {
           handleScheme(json, vcs, Router)
