@@ -376,8 +376,7 @@ class NavComp extends Component {
 			});
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
-        RNPlus.ViewManager &&
-        RNPlus.ViewManager.trigger('router_view_actived');
+        RNPlus.ViewManager && RNPlus.ViewManager.trigger('router_view_actived');
       }
       // 全局失活处理
       const globalDeactived = this.routerOpts.deactived;
