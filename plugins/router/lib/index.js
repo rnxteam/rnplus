@@ -8,9 +8,7 @@ import ReactNative, {
   AppRegistry,
   View,
 } from 'react-native';
-// import {
-//   LogMonitor,
-// } from 'react-native/Libraries/RNXComponents/index.js';
+import { LogMonitor } from 'react-native/Libraries/RNXComponents';
 
 import styles from './styles';
 import './sceneConfig';
@@ -22,16 +20,15 @@ import beforeReceiveScheme from './beforeReceiveScheme';
 import syncViewsToNative from './syncViewsToNative';
 
 // 埋点方法
-// function log(key, data = null) {
-// if (key) {
-//   LogMonitor.sendLog({
-//     risk_level: 0,
-//     entry_key: `app.rnplus.${key}`,
-//     entry_detail: data,
-//   });
-// }
-// }
-function log() { }
+function log(key, data = null) {
+	if (key) {
+		LogMonitor.sendLog({
+			risk_level: 0,
+			entry_key: `app.rnplus.${key}`,
+			entry_detail: data,
+		});
+	}
+}
 
 const Router = {};
 /**
@@ -370,6 +367,13 @@ class NavComp extends Component {
 
       // 全局激活处理
       const globalActived = this.routerOpts.actived;
+      log('page_actived', {
+      	pageName: currentRoute.name,
+				params: gActivedParam
+			});
+			log('page_deactived', {
+				pageName: previousRoute.name
+			});
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
         RNPlus.ViewManager &&
