@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.28
+
+- 新增全局埋点：路由变化
+
 ## 0.30.27
 
 - 新增 `RNPlus.ViewManager`
