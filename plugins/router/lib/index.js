@@ -376,12 +376,9 @@ class NavComp extends Component {
 
       // 全局激活处理
       const globalActived = this.routerOpts.actived;
-      log('page_actived', {
+			currentRoute && log('page_actived', {
       	pageName: currentRoute.name,
 				params: gActivedParam
-			});
-			log('page_deactived', {
-				pageName: previousRoute.name
 			});
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
@@ -389,6 +386,9 @@ class NavComp extends Component {
       }
       // 全局失活处理
       const globalDeactived = this.routerOpts.deactived;
+			previousRoute && log('page_deactived', {
+				pageName: previousRoute.name
+			});
       if (previousRoute && typeof globalDeactived === 'function') {
         globalDeactived(previousRoute);
       }
