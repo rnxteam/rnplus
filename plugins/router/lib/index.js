@@ -18,9 +18,19 @@ import errorHandler from './util/errorHandler.js';
 import handleScheme from './handleScheme';
 import beforeReceiveScheme from './beforeReceiveScheme';
 import syncViewsToNative from './syncViewsToNative';
+import RNPlus from "../../../lib/core";
 
 // 埋点方法
 function log(key, data = null) {
+	if (RNPlus.defaults.no_log) {
+		log = NOOP;
+		return;
+	}
+	log = realLog;
+	realLog(key, data);
+}
+
+function realLog(key, data = null) {
 	if (key) {
 		LogMonitor.sendLog({
 			risk_level: 0,
@@ -29,7 +39,6 @@ function log(key, data = null) {
 		});
 	}
 }
-
 const Router = {};
 /**
  * VC 数组，每个 VC 包含一个导航器和一个导航栏
