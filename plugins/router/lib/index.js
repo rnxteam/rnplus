@@ -22,7 +22,7 @@ import RNPlus from "../../../lib/core";
 
 // 埋点方法
 function log(key, data = null) {
-	if (RNPlus.defaults.no_log) {
+	if (RNPlus.defaults.Logs === false) {
 		log = NOOP;
 		return;
 	}
