@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.30.29
+
+- 新增全局埋点开关，默认打开。指定 RNPlus.defaults.Logs = false 时关闭。
 
 ## 0.30.28
 
