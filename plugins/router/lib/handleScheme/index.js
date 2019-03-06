@@ -96,7 +96,12 @@ function handleScheme(json, vcs, Router) {
     if (typeof onReceiveScheme === 'function') {
       onReceiveScheme(urlData);
     }
-  } else if (type === 'open') {
+  } else if (type === 'silent') {
+		const onReceiveScheme = RNPlus.defaults.onReceiveScheme;
+		if (typeof onReceiveScheme === 'function') {
+			onReceiveScheme(urlData);
+		}
+	} else if (type === 'open') {
     hasCallSendNativeEvents = true;
     Bridge.openNewVC(initProps, searchData.moduleName, data => {
       Bridge.schemeCallBack(json.callbackId, {
