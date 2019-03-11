@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## 0.30.30
+
+- 新增 scheme 类型：silent
+
 ## 0.30.29
 
 - 新增全局埋点开关，默认打开。指定 RNPlus.defaults.Logs = false 时关闭。
