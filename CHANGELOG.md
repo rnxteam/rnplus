@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.30.31
+
+- 修复 backToVC 传参错误的 bug
+
 ## 0.30.30
 
 - 新增 scheme 类型：silent

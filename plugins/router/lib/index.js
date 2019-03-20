@@ -669,14 +669,14 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
   if (nextView) {
     if (nextRouteInfo) {
       const { route, routeIndex, vcIndex } = nextRouteInfo;
-      const { nav } = vcs[vcIndex];
+      const vc = vcs[vcIndex];
 
       if (!popToRouteLock) {
         // popToRouteLock = true;
 
         gActivedParam = opts.param;
         // MAIN: 调用原生 API，路由回退
-        nav.popToRoute(route, () => {
+        vc.nav.popToRoute(route, () => {
           popToRouteLock = false;
         });
 
@@ -688,10 +688,7 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
             api: 'BackTo',
             vcsLen: vcs.length,
           });
-          Bridge.backToVC({
-            // VC 标识
-            index: vcIndex,
-          });
+          Bridge.backToVC(vc.tag);
         }
 
         checkAndOpenSwipeBack(vcIndex);
@@ -738,10 +735,7 @@ Router.home = (opts = {}) => {
       api: 'home',
       vcsLen: vcs.length,
     });
-    Bridge.backToVC({
-      // VC 标识
-      index: 0,
-    });
+    Bridge.backToVC(vcs[0].tag);
   }
 
   const { nav } = vcs[0];
