@@ -597,18 +597,19 @@ Router.open = (name, opts = {}) => {
 
     const method = opts.replace ? 'replace' : 'push';
 
-    gActivedParam = opts.param;
-
-    nav[method]({
-      name,
-      opts,
-      routerPlugin: nextView.Component.routerPlugin,
-      hashKey: getHashKey(),
-      hasReady: false,
-      em: null,
+    // 为了防止连续路由操作导致 gActivedParam 被覆盖，此处使用 setTimeout 断开连续
+    setTimeout(() => {
+      gActivedParam = opts.param;
+      nav[method]({
+        name,
+        opts,
+        routerPlugin: nextView.Component.routerPlugin,
+        hashKey: getHashKey(),
+        hasReady: false,
+        em: null,
+      });
+      setSwipeBackEnabled(false);
     });
-
-    setSwipeBackEnabled(false);
 
     res = true;
   }
@@ -632,9 +633,11 @@ Router.back = (opts = {}) => {
 
     if (routes.length > 1) {
       // 如果当前 routes 有超过一个路由，说明在当前 VC 回退
-      gActivedParam = opts.param;
-      nav.pop();
-      checkAndOpenSwipeBack();
+      setTimeout(() => {
+        gActivedParam = opts.param;
+        nav.pop();
+        checkAndOpenSwipeBack();
+      });
 
       res = true;
     } else {
@@ -674,24 +677,26 @@ Router.backTo = (name, opts = {}, _fromGoto) => {
       if (!popToRouteLock) {
         // popToRouteLock = true;
 
-        gActivedParam = opts.param;
-        // MAIN: 调用原生 API，路由回退
-        vc.nav.popToRoute(route, () => {
-          popToRouteLock = false;
-        });
-
-        if (vcIndex < vcs.length - 1) {
-          // 暂存数据
-          // 通知 Native
-          log('backToVC', {
-            index: vcIndex,
-            api: 'BackTo',
-            vcsLen: vcs.length,
+        setTimeout(() => {
+          gActivedParam = opts.param;
+          // MAIN: 调用原生 API，路由回退
+          vc.nav.popToRoute(route, () => {
+            popToRouteLock = false;
           });
-          Bridge.backToVC(vc.tag);
-        }
 
-        checkAndOpenSwipeBack(vcIndex);
+          if (vcIndex < vcs.length - 1) {
+            // 暂存数据
+            // 通知 Native
+            log('backToVC', {
+              index: vcIndex,
+              api: 'BackTo',
+              vcsLen: vcs.length,
+            });
+            Bridge.backToVC(vc.tag);
+          }
+
+          checkAndOpenSwipeBack(vcIndex);
+        });
 
         res = true;
       }
@@ -727,15 +732,17 @@ Router.home = (opts = {}) => {
   const vcsLen = vcs.length;
 
   if (vcsLen > 1) {
-    // 暂存数据
-    gActivedParam = opts.param;
-    // 通知 Native
-    log('backToVC', {
-      index: 0,
-      api: 'home',
-      vcsLen: vcs.length,
+    setTimeout(() => {
+      // 暂存数据
+      gActivedParam = opts.param;
+      // 通知 Native
+      log('backToVC', {
+        index: 0,
+        api: 'home',
+        vcsLen: vcs.length,
+      });
+      Bridge.backToVC(vcs[0].tag);
     });
-    Bridge.backToVC(vcs[0].tag);
   }
 
   const { nav } = vcs[0];
@@ -746,8 +753,11 @@ Router.home = (opts = {}) => {
     return false;
   }
 
-  nav.popToTop();
-  setSwipeBackEnabled(true, 0);
+  setTimeout(() => {
+    gActivedParam = opts.param;
+    nav.popToTop();
+    setSwipeBackEnabled(true, 0);
+  });
 
   return true;
 };
@@ -809,17 +819,17 @@ Router.resetTo = (name, opts = {}) => {
     const currentVC = getCurrentVC();
 
     if (currentVC && currentVC.nav) {
-      currentVC.nav.resetTo({
-        name,
-        opts,
-        routerPlugin: nextView.Component.routerPlugin,
-        hashKey: getHashKey(),
+      setTimeout(() => {
+        gActivedParam = opts.param;
+        currentVC.nav.resetTo({
+          name,
+          opts,
+          routerPlugin: nextView.Component.routerPlugin,
+          hashKey: getHashKey(),
+        });
+        checkAndOpenSwipeBack();
       });
-
-      checkAndOpenSwipeBack();
-
-      gActivedParam = opts.param;
-
+      
       res = true;
     }
   }
