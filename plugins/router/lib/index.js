@@ -21,21 +21,22 @@ import syncViewsToNative from './syncViewsToNative';
 import RNPlus from "../../../lib/core";
 
 // 埋点方法
-function log(key, data = null) {
+function log(key, data = null, rootData = null) {
 	if (RNPlus.defaults.Logs === false) {
 		log = NOOP;
 		return;
 	}
 	log = realLog;
-	realLog(key, data);
+	realLog(key, data, rootData);
 }
 
-function realLog(key, data = null) {
+function realLog(key, data = null, rootData = null) {
 	if (key) {
 		LogMonitor.sendLog({
 			risk_level: 0,
 			entry_key: `app.rnplus.${key}`,
 			entry_detail: data,
+      ...rootData
 		});
 	}
 }
@@ -379,7 +380,9 @@ class NavComp extends Component {
 			currentRoute && log('page_actived', {
       	pageName: currentRoute.name,
 				params: gActivedParam
-			});
+			}, {
+        rnplus_pageName: currentRoute.name
+      });
       if (typeof globalActived === 'function') {
         globalActived(currentRoute, gActivedParam);
         RNPlus.ViewManager && RNPlus.ViewManager.trigger('router_view_actived');
@@ -388,7 +391,9 @@ class NavComp extends Component {
       const globalDeactived = this.routerOpts.deactived;
 			previousRoute && log('page_deactived', {
 				pageName: previousRoute.name
-			});
+			}, {
+        rnplus_pageName: previousRoute.name
+      });
       if (previousRoute && typeof globalDeactived === 'function') {
         globalDeactived(previousRoute);
       }
